@@ -4,19 +4,23 @@
 import okx.MarketData as MarketData
 from config import ConfigSingleton
 import utils.utils as utils
+from utils.logs import LogSingleton
 import utils.serialize as serialize
+import time
 
 conf = ConfigSingleton()
+log = LogSingleton()
 marketDataAPI = MarketData.MarketAPI(flag = conf.simu_mode)
 
 historyKLine = []
 
-instSet = { "TRB", "EOS", "1000SATS", "ORDI", "BNB", "BTC", "ETH", "XRP", "BCH", "LTC", "ETC",
-            "GMT", "APE", "OP", "NEAR", "AVAX", "SOL", "ENS", "LUNA", "MATIC", "STEEM", "XMR" }
+# already finished ENS GMT MATIC OP SOL
+instSet = { "TRB", "EOS", "SATS", "ORDI", "OKB", "BTC", "ETH", "XRP", "BCH", "LTC", "ETC",
+            "APE", "NEAR", "AVAX", "LUNA" }
 
 # [1s/1m/3m/5m/15m/30m/1H/2H/4H]
 barDict = {
-    "1s": 1 * 1000,
+    # "1s": 1 * 1000,
     "1m": 60 * 1000,
     "3m": 3 * 60 * 1000,
     "5m": 5 * 60 * 1000,
@@ -33,6 +37,7 @@ def download(instID, bar, beginTime, endTime, limit = 100):
     toTS = fromTS + interval * limit
 
     while (fromTS < endTime):
+        time.sleep(0.11)
         downloadPage(instID, bar, fromTS, toTS)
         fromTS = toTS
         toTS = fromTS + interval * limit
@@ -44,18 +49,26 @@ def downloadPage(instID, bar, fromTS, toTS):
     # needs to minus 1 for before and after
     print("get history candlestick for ", instID, " in ", bar, ", from ", fromTS, ", to ", toTS)
 
-    result = marketDataAPI.get_history_candlesticks(
-        instId  = instID,
-        bar     = bar,
-        before  = str(fromTS - 1),
-        after   = str(toTS - 1),
-        # limit = "100",
-    )
-    dataList = utils.formatResponse(result)
-    dataList.reverse()
+    while True:
+        try:
+            result = marketDataAPI.get_history_candlesticks(
+                instId  = instID,
+                bar     = bar,
+                before  = str(fromTS - 1),
+                after   = str(toTS - 1),
+                # limit = "100",
+            )
 
-    global historyKLine
-    historyKLine.extend(dataList)
+            dataList = utils.formatResponse(result)
+            dataList.reverse()
+
+            global historyKLine
+            historyKLine.extend(dataList)
+
+            return
+        except Exception as e:
+            log.error("exception in downloadPage for instID: " + instID + ", bar: " + bar + ", fromTS: " + str(fromTS) + ", toTS: " + str(toTS) + ", msg: " + str(e))
+
 
 def dumpHistory(instID, bar, begin, end, fileName):
 
@@ -83,14 +96,31 @@ def demo():
     bar = "15m"
     begin = conf.TS2019
     end = conf.TS2024
-    fileName = "./pkl/" + "DEMO-BTC-USDT-15m"
+    fileName = conf.marketDataFilePrefix + "DEMO-BTC-USDT-15m"
     dumpHistory(instID, bar, begin, end, fileName)
 
 def getBeginEnd(instID):
-    # if instID == "BTC-USDT":
-    #     return [conf.TS2024, ConfigSingleton.getDayTS("2024", "01", "02")]
-    # elif instID == "ETH-USDT":
-    #     return [conf.TS2024, ConfigSingleton.getDayTS("2024", "01", "02")]
+    # okex
+    if instID == "SATS-USDT":
+        return [ConfigSingleton.getDayTS("2023", "12", "18"), conf.TS2024]
+    if instID == "LUNA-USDT":
+        return [ConfigSingleton.getDayTS("2022", "05", "28"), conf.TS2024]
+    if instID == "SOL-USDT":
+        return [ConfigSingleton.getDayTS("2020", "09", "27"), conf.TS2024]
+    if instID == "AVAX-USDT":
+        return [ConfigSingleton.getDayTS("2020", "09", "20"), conf.TS2024]
+    if instID == "TRB-USDT":
+        return [ConfigSingleton.getDayTS("2020", "08", "23"), conf.TS2024]
+    if instID == "ORDI-USDT":
+        return [ConfigSingleton.getDayTS("2023", "05", "14"), conf.TS2024]
+    if instID == "GMT-USDT":
+        return [ConfigSingleton.getDayTS("2022", "03", "27"), conf.TS2024]
+    if instID == "APE-USDT":
+        return [ConfigSingleton.getDayTS("2022", "03", "13"), conf.TS2024]
+    if instID == "ENS-USDT":
+        return [ConfigSingleton.getDayTS("2021", "11", "07"), conf.TS2024]
+    if instID == "MATIC-USDT":
+        return [ConfigSingleton.getDayTS("2021", "03", "28"), conf.TS2024]
 
     return [conf.TS2019, conf.TS2024]
 
@@ -101,7 +131,7 @@ if __name__ == "__main__":
     for instID in instList:
         for bar in bars:
             [begin, end] = getBeginEnd(instID)
-            fileName = "./pkl/" + instID + "-" + bar
+            fileName = conf.marketDataFilePrefix + instID + "-" + bar
 
             print("dump history for ", instID, " for ", bar, ", from ", begin, " to ", end, ", dump to ", fileName, ".pkl.")
             dumpHistory(instID, bar, begin, end, fileName)

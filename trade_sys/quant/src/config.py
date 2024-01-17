@@ -33,6 +33,9 @@ class ConfigSingleton:
         # self.publicSubUrl = "wss://wspap.okex.com:8443/ws/v5/public?brokerId=9999"
         self.publicSubUrl = "wss://wspap.okx.com:8443/ws/v5/public?brokerId=9999"
 
+        # file path
+        self.marketDataFilePrefix = "./pkl/history_candles/"
+
         # datetime
         self.TS2016 = ConfigSingleton.getYearTS("2016")
         self.TS2017 = ConfigSingleton.getYearTS("2017")

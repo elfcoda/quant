@@ -12,7 +12,7 @@ class LogSingleton:
         return cls._instance
 
     def __init__(self):
-        logging.basicConfig(filename='quantLog.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+        logging.basicConfig(filename='quantLog.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 
     def debug(self, msg):
         logging.debug(msg)

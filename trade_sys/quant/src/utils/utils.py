@@ -16,7 +16,8 @@ def formatResponse(rsp):
     msg = rsp["msg"]
 
     if code != 0:
-        log.error("error: " + msg)
+        log.error("error in formatResponse: " + msg)
+        raise ValueError(msg)
 
     # list of ['1704595500000', '43940.1', '43956.5', '43842.4', '43929.8', '1140.31704231', '50064751.471025097', '50064751.471025097', '1']
     data = rsp["data"]
