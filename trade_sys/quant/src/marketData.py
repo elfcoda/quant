@@ -14,9 +14,9 @@ marketDataAPI = MarketData.MarketAPI(flag = conf.simu_mode)
 
 historyKLine = []
 
-# already finished ENS GMT MATIC OP SOL
-instSet = { "TRB", "EOS", "SATS", "ORDI", "OKB", "BTC", "ETH", "XRP", "BCH", "LTC", "ETC",
-            "APE", "NEAR", "AVAX", "LUNA" }
+# already finished
+# instSet = { "APE", "AVAX", "BCH", "BTC", "ENS", "EOS", "ETC", "ETH", "GMT", "LTC", "LUNA", "MATIC", "NEAR", "OKB", "OP", "ORDI", "SATS", "SOL", "TRB", "XRP" }
+instSet = { "ETC" }
 
 # [1s/1m/3m/5m/15m/30m/1H/2H/4H]
 barDict = {
@@ -37,7 +37,6 @@ def download(instID, bar, beginTime, endTime, limit = 100):
     toTS = fromTS + interval * limit
 
     while (fromTS < endTime):
-        time.sleep(0.11)
         downloadPage(instID, bar, fromTS, toTS)
         fromTS = toTS
         toTS = fromTS + interval * limit
@@ -67,7 +66,8 @@ def downloadPage(instID, bar, fromTS, toTS):
 
             return
         except Exception as e:
-            log.error("exception in downloadPage for instID: " + instID + ", bar: " + bar + ", fromTS: " + str(fromTS) + ", toTS: " + str(toTS) + ", msg: " + str(e))
+            log.debug("exception in downloadPage for instID: " + instID + ", bar: " + bar + ", fromTS: " + str(fromTS) + ", toTS: " + str(toTS) + ", msg: " + str(e))
+            time.sleep(0.2)
 
 
 def dumpHistory(instID, bar, begin, end, fileName):
@@ -105,6 +105,8 @@ def getBeginEnd(instID):
         return [ConfigSingleton.getDayTS("2023", "12", "18"), conf.TS2024]
     if instID == "LUNA-USDT":
         return [ConfigSingleton.getDayTS("2022", "05", "28"), conf.TS2024]
+    if instID == "OP-USDT":
+        return [ConfigSingleton.getDayTS("2022", "05", "29"), conf.TS2024]
     if instID == "SOL-USDT":
         return [ConfigSingleton.getDayTS("2020", "09", "27"), conf.TS2024]
     if instID == "AVAX-USDT":

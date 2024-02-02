@@ -40,7 +40,7 @@ def formatResponse(rsp):
 
         item.append(time)
 
-        print(item)
+        # print(item)
 
     return data
 
