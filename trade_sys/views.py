@@ -14,3 +14,8 @@ def test(request):
     rsp = patternDict
     return JsonResponse(rsp)
 
+def analyse(request):
+    analyseDict = parsePkl.loadAnalyse(quant_path + "pkl/analyse/analyse.dict")
+    rsp = analyseDict
+    return JsonResponse(rsp)
+

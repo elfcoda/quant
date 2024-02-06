@@ -8,4 +8,5 @@ app_name = 'trade_sys'
 
 urlpatterns = [
     path("test/", views.test, name='test'),
+    path("analyse/", views.analyse, name='analyse'),
 ]
