@@ -20,6 +20,10 @@ class ConfigSingleton:
     def getDayTS(year, mon, day):
         return int(datetime.timestamp(datetime.strptime(year + "-" + mon + "-" + day + " 00:00:00", "%Y-%m-%d %H:%M:%S"))) * 1000
 
+    @staticmethod
+    def getNow():
+        return int(datetime.timestamp(datetime.now()) * 1000)
+
     def __init__(self):
         self.api_key = "81531845-daf2-4097-8c5b-6278be6bb940"
         self.secret_key = "5B52C02E28A2BCC65DA667104D70E780"
@@ -34,7 +38,7 @@ class ConfigSingleton:
         self.publicSubUrl = "wss://wspap.okx.com:8443/ws/v5/public?brokerId=9999"
 
         # file path
-        self.marketDataFilePrefix = "./pkl/history_candles/"
+        self.marketDataFilePrefix = "pkl/history_candles/"
 
         # datetime
         self.TS2016 = ConfigSingleton.getYearTS("2016")

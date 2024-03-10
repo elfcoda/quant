@@ -9,7 +9,7 @@ sys.path.append(quant_path)
 import parsePkl
 
 # Create your views here.
-def test(request):
+def pattern(request):
     patternDict = parsePkl.loadPattern(quant_path + "pkl/pattern/pattern.dict")
     rsp = patternDict
     return JsonResponse(rsp)
@@ -18,4 +18,33 @@ def analyse(request):
     analyseDict = parsePkl.loadAnalyse(quant_path + "pkl/analyse/analyse.dict")
     rsp = analyseDict
     return JsonResponse(rsp)
+
+def analyseMACD(request):
+    l = parsePkl.loadMACD(quant_path + "pkl/pattern/macd.lst")
+    rsp = { "rsp": l }
+    return JsonResponse(rsp)
+
+def weekends(request):
+    l = parsePkl.filterWeekendsCrypto(quant_path)
+    rsp = { "rsp": l }
+    return JsonResponse(rsp)
+
+def HT(request):
+    l = parsePkl.loadHT(quant_path + "pkl/pattern/HT.lst")
+    rsp = { "rsp": l }
+    return JsonResponse(rsp)
+
+def days(request):
+    l = parsePkl.getDays(quant_path)
+    rsp = { "rsp": l }
+    return JsonResponse(rsp)
+
+def test(request):
+    l = parsePkl.loadTest(quant_path + "pkl/analyse/test.lst")
+    rsp = { "rsp": l }
+    return JsonResponse(rsp)
+
+
+
+
 
