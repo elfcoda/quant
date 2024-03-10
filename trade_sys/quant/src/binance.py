@@ -74,7 +74,7 @@ def notify(symbol, subject, content):
         previousNotify = notifyDict[symbol]
     currentTime = int(time.time())
     if currentTime - previousNotify > notifyInterval:
-        callMe(subject, content):
+        callMe(subject, content)
         notifyDict[symbol] = currentTime
 
 
