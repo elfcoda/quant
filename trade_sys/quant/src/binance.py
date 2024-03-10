@@ -20,6 +20,7 @@ HISTORY_CANDLES_VOL = 5
 
 symbolList = []
 notifyDict = {}
+nonSpotSet = set(["BCC"])
 
 def callMe(subject, content):
     command = "osascript email.applescript '" + subject + "' '" + content + "'"
@@ -80,11 +81,17 @@ def notify(symbol, subject, content):
 
 def getKlines():
     cnt = 0
+    aboveCnt = 0
+    belowCnt = 0
 
     global symbolList
     for symbol in symbolList:
+        symbolBase = symbol[:-4]
+        if symbolBase in nonSpotSet:
+            continue
+
         cnt += 1
-        if cnt == 200:
+        if cnt == 500:
             return
 
         # print("symbol is: ", symbol)
@@ -125,18 +132,22 @@ def getKlines():
         diffPercentage = (float(diff) / float(latestPrice)) * 100
         diffThreshold = 0.1
         if diff > 0 and diffPercentage < diffThreshold:
-            subject = symbol + " 接近MA7"
-            content = symbol + " 接近MA7"
+            aboveCnt += 1
+            subject = symbolBase + " 接近MA7"
+            content = symbolBase + " 接近MA7"
             # notify(symbol, subject, content)
-            print(subject)
+            print("\033[33m", subject, "\033[0m")
         elif diff <= 0:
-            subject = symbol + " 低于MA7"
-            content = symbol + " 低于MA7"
+            belowCnt += 1
+            subject = symbolBase + " 低于MA7"
+            content = symbolBase + " 低于MA7"
             # notify(symbol, subject, content)
-            print(subject)
+            print("\033[31m", subject, "\033[0m")
 
-        # TODO: MACD
-        # TODO: Exclude Insts
+    print("aboveCnt: ", aboveCnt, ", belowCnt: ", belowCnt)
+
+    # TODO: MACD
+
 
 def func():
     print("called per min")
@@ -144,7 +155,7 @@ def func():
 # timer, execute func() every interval seconds
 def schedule_func(scheduler):
     getKlines()
-    interval = 5 * 60
+    interval = 30 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
 if __name__ == "__main__":
