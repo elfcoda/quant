@@ -18,7 +18,7 @@ ASSERT_IDX_MACD_INC = 2
 ASSERT_IDX_MACD_DEC = 3
 myAsserts = {
             "BTC": [100, [31511.0], True, False],
-            "OCEAN": [100, [1.42], False, False],
+            "OCEAN": [1.22, [1.17], False, False],
             "PEPE": [200, [0.00000830], False, False]
         }
 
@@ -126,14 +126,14 @@ def monitorMinutesAmp(symbolBase):
         kline15m = eval(response15m.text)
 
         currentTime = int(time.time())
-        o3m = kline3m[-1][1]
-        h3m = kline3m[-1][2]
-        l3m = kline3m[-1][3]
-        c3m = kline3m[-1][4]
-        o15m = kline15m[-1][1]
-        h15m = kline15m[-1][2]
-        l15m = kline15m[-1][3]
-        c15m = kline15m[-1][4]
+        o3m = float(kline3m[-1][1])
+        h3m = float(kline3m[-1][2])
+        l3m = float(kline3m[-1][3])
+        c3m = float(kline3m[-1][4])
+        o15m = float(kline15m[-1][1])
+        h15m = float(kline15m[-1][2])
+        l15m = float(kline15m[-1][3])
+        c15m = float(kline15m[-1][4])
 
         nkey = getNotifyKey(symbolBase, NOTIFY_TYPE_BIG_FALL_3M)
         if shouldNotify(symbolBase, NOTIFY_TYPE_BIG_FALL_3M, currentTime, nkey):
@@ -165,7 +165,8 @@ def monitorAsserts():
         for price in priceList:
             monitorPrice(symbolBase, price, buyPrice)
 
-        monitorMACD(symbolBase, price)
+        # 暂时不需要判断MACD
+        # monitorMACD(symbolBase, price)
 
         # monitorNeedle(symbolBase)
 
