@@ -8,6 +8,7 @@ import talib
 import matplotlib.pyplot as plt
 from marketData import genBars, instSet, barDict
 from cryptoType import getInstDays
+from binance_UI_console_4 import getFocus1HLines
 from config import ConfigSingleton
 conf = ConfigSingleton()
 
@@ -547,7 +548,9 @@ def filterWeekendsCrypto(quantPre):
     return filterWeekends(li)
 
 def getDays(quantPre):
-    return getInstDays()
+    kl = getFocus1HLines()
+    return kl
+    # return getInstDays()
 
 def ayalyse():
     coin = "EOS"
@@ -589,6 +592,9 @@ def test():
 
 if __name__ == "__main__":
     # validate()
+
+    getDays("")
+
     ayalyse()
 
 

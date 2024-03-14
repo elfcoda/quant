@@ -14,11 +14,11 @@ class ConfigSingleton:
 
     @staticmethod
     def getYearTS(year):
-        return int(datetime.timestamp(datetime.strptime(year + "-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"))) * 1000
+        return int(datetime.timestamp(datetime.strptime(str(year) + "-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"))) * 1000
 
     @staticmethod
     def getDayTS(year, mon, day):
-        return int(datetime.timestamp(datetime.strptime(year + "-" + mon + "-" + day + " 00:00:00", "%Y-%m-%d %H:%M:%S"))) * 1000
+        return int(datetime.timestamp(datetime.strptime(str(year) + "-" + str(mon) + "-" + str(day) + " 00:00:00", "%Y-%m-%d %H:%M:%S"))) * 1000
 
     @staticmethod
     def getNow():
