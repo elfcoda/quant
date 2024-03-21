@@ -5,19 +5,27 @@
 
 import requests
 import talib
+import utils.serialize as serialize
 import numpy as np
 import utils.utils as utils
 import sched
 import time
 from binance_comm import *
-from binance_util import callMe
+from binance_util import *
 from network_binance import request_urls_batch
+from all_coins import coins_wenjie, coins_ziyan
 
 aboveCnt = 0
 belowCnt = 0
+firstRun = True
+serialNotifyFile = "binance_UI_console_notify_dict"
 
 symbolList = []
 notifyDict = {}
+
+# of symbolBase
+viewList = []
+viewListFile = "UI_ViewList"
 
 def getSpotSymbols():
     global symbolList
@@ -32,18 +40,20 @@ def getSpotSymbols():
                 symbolList.append(symbol["symbol"])
 
 
-def notify(symbol, subject, content):
+def notify(symbol, subject, content, pid):
     global notifyDict
 
     previousNotify = 0
-    notifyInterval = 15 * 60
+    notifyInterval = 24 * 60 * 60
     # previous notify seconds
     if symbol in notifyDict:
         previousNotify = notifyDict[symbol]
     currentTime = int(time.time())
     if currentTime - previousNotify > notifyInterval:
-        callMe(subject, content)
+        # callSomeone(subject, content, pid)
         notifyDict[symbol] = currentTime
+        serialize.dump(notifyDict, serialNotifyFile)
+
 
 # [BTCUSDT] -> [BTC]
 def symbolList2symbolBaseList(sl):
@@ -135,6 +145,7 @@ def handleRspStrategy2(symbol, kline, kline1h, kline4h):
 def handleRspStrategy1(symbol, kline, kline1h, kline4h):
     global aboveCnt
     global belowCnt
+    global viewList
 
     symbolBase = symbol[:-4]
 
@@ -190,7 +201,8 @@ def handleRspStrategy1(symbol, kline, kline1h, kline4h):
 
     macd_UP = False
     if len(macdhist4h) > 5 and macdhist4h[-1] > macdhist4h[-2] > macdhist4h[-3]:
-        macd_UP = True
+        # macd_UP = True
+        macd_UP = False
 
     # calcAmplitudeList(opens1h, highs1h, lows1h, closes1h, symbolBase, tss1h)
 
@@ -199,26 +211,32 @@ def handleRspStrategy1(symbol, kline, kline1h, kline4h):
     # 需要在小时结尾判断
     # if lows1h[-1] > lows1h[-2]:
     # if macdhist[-1] > macdhist[-2]:
-    if True:
+    if diffPercentage < diffThreshold:
+        viewList.append(symbolBase)
+
+        tp = 1
+        pid = PID_WENJIE
+        if symbolBase in coins_ziyan:
+            tp = 3
+            pid = PID_ZIYAN
+
         # 可以挂插针单对这些币
-        if diffPercentage < diffThreshold:
-            # 优先做
+        if latestPrice > ma7[-1]:
             aboveCnt += 1
-            subject = symbolBase + " 接近MA7"
-            content = symbolBase + " 接近MA7"
-            # notify(symbol, subject, content)
-            formatPrint(MATypeAbove, symbolBase, subject, macd_UP)
-        elif diff <= 0:
-            # 次优先做
+            subject = symbolBase + " 接近MA7上方"
+            content = symbolBase + " 接近MA7上方"
+            notify(symbol, subject, content, pid)
+            formatPrint3(tp, subject)
+        else:
             belowCnt += 1
-            subject = symbolBase + " 低于MA7"
-            content = symbolBase + " 低于MA7"
-            # notify(symbol, subject, content)
-            formatPrint(MATypeBelow, symbolBase, subject, macd_UP)
+            subject = symbolBase + " 接近MA7下方"
+            content = symbolBase + " 接近MA7下方"
+            notify(symbol, subject, content, pid)
+            formatPrint3(tp + 1, subject)
 
 
 # UI code
-def getFocus1HLines():
+def getFocus1HLines(quantPre, pid = PID_DEFAULT):
     targetKLines = []
 
     urls = []
@@ -229,8 +247,16 @@ def getFocus1HLines():
 
     global symbolList
     symbolBaseList = symbolList2symbolBaseList(symbolList)
+
+    symbolBaseViewList = serialize.load(quantPre + viewListFile)
+    if pid == PID_WENJIE:
+        symbolBaseViewList = [symbolBase for symbolBase in symbolBaseViewList if symbolBase in coins_wenjie]
+    elif pid == PID_ZIYAN:
+        symbolBaseViewList = [symbolBase for symbolBase in symbolBaseViewList if symbolBase in coins_ziyan]
+
     # for symbolBase in focusSet:
-    for symbolBase in symbolBaseList:
+    # for symbolBase in symbolBaseList:
+    for symbolBase in symbolBaseViewList:
         symbol = symbolBase + "USDT"
 
         symbolList1H.append(symbolBase)
@@ -247,7 +273,7 @@ def getFocus1HLines():
     rsp1h = asyncio.run(request_urls_batch(urls1h))
 
 
-    for i in range(0, len(focusSet)):
+    for i in range(0, len(symbolList1H)):
         symbolBase = symbolList1H[i]
         kline = eval(rsp[i][1])
         kline1h = eval(rsp1h[i][1])
@@ -273,12 +299,13 @@ def getFocus1HLines():
         # 宽容度会大点
         diffThreshold = 2
 
+        targetKLines.append([kline1h, 0, 0, symbolBase])
         # 可以挂插针单对这些币
         # 查看是否是在上升趋势
-        if diffPercentage < diffThreshold:
-            targetKLines.append([kline1h, 0, 0, symbolBase])
-        elif diff <= 0:
-            targetKLines.append([kline1h, 0, 0, symbolBase])
+        # if diffPercentage < diffThreshold:
+        #     targetKLines.append([kline1h, 0, 0, symbolBase])
+        # elif diff <= 0:
+        #     targetKLines.append([kline1h, 0, 0, symbolBase])
 
     return targetKLines
 
@@ -286,11 +313,11 @@ def getKlines():
     cnt = 0
 
     global symbolList
-    global aboveCnt
-    global belowCnt
-    aboveCnt = 0
-    belowCnt = 0
     symbolBaseList = symbolList2symbolBaseList(symbolList)
+
+    symbolBaseList = []
+    symbolBaseList.extend(coins_wenjie)
+    symbolBaseList.extend(coins_ziyan)
 
     urls = []
     urls1h = []
@@ -319,14 +346,21 @@ def getKlines():
     rsp1h = asyncio.run(request_urls_batch(urls1h))
     rsp4h = asyncio.run(request_urls_batch(urls4h))
 
+    global aboveCnt
+    global belowCnt
+    aboveCnt = 0
+    belowCnt = 0
     for i in range(0, len(KLineList)):
         symbolBase = KLineList[i]
         kline = eval(rsp[i][1])
         kline1h = eval(rsp1h[i][1])
         kline4h = eval(rsp4h[i][1])
-        handleRspStrategy2(symbolBase + "USDT", kline, kline1h, kline4h)
+        handleRspStrategy1(symbolBase + "USDT", kline, kline1h, kline4h)
 
-    # print("aboveCnt: ", aboveCnt, ", belowCnt: ", belowCnt)
+    print("aboveCnt: ", aboveCnt, ", belowCnt: ", belowCnt)
+
+    global viewList
+    serialize.dump(viewList, viewListFile)
     print("all crypto finished.")
 
 
@@ -339,15 +373,22 @@ def schedule_func(scheduler):
     interval = 30 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
+def initDict():
+    global notifyDict
+    notifyDict = serialize.load(serialNotifyFile)
+
+
 if __name__ == "__main__":
     getSpotSymbols()
 
-    # getFocus1HLines()
+    # getFocus1HLines(quantPre)
 
     # for symbol in symbolList:
     #     print(symbol)
 
     print("all: ", symbolList.__len__())
+
+    initDict()
 
     scheduler = sched.scheduler(time.time, time.sleep)
     scheduler.enter(0, 1, schedule_func, (scheduler,))

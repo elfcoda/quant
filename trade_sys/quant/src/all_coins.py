@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-ziyan = [
+coins_ziyan = [
     "1000SATS",
     "1INCH",
     "AAVE",
@@ -75,7 +75,7 @@ ziyan = [
     "IOTA",
 ]
 
-wenjie = [
+coins_wenjie = [
     "IOTX",
     "JASMY",
     "JUP",

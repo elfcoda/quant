@@ -547,8 +547,8 @@ def filterWeekendsCrypto(quantPre):
 
     return filterWeekends(li)
 
-def getDays(quantPre):
-    kl = getFocus1HLines()
+def getDays(quantPre, pid):
+    kl = getFocus1HLines(quantPre, pid)
     return kl
     # return getInstDays()
 

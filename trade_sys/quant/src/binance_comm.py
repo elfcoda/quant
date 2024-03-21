@@ -110,6 +110,19 @@ MATypeNone = 0
 MATypeAbove = 1
 MATypeBelow = 2
 
+def formatPrint3(tp, content):
+    # wenjie: 1 2, ziyan: 3 4
+    if tp == 1:
+        print("\033[31m", content, "\033[0m")
+    elif tp == 2:
+        print("\033[32m", content, "\033[0m")
+    elif tp == 3:
+        print("\033[33m", content, "\033[0m")
+    elif tp == 4:
+        print("\033[34m", content, "\033[0m")
+    else:
+        print(content)
+
 def formatPrint2(tp, symbolBase, content, macd_UP = False):
     if tp == 1:
         print("\033[31m", content, "\033[0m")

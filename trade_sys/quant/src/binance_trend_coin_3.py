@@ -4,6 +4,8 @@
 # 新加坡的IP可以用
 
 from binance_comm import *
+from binance_util import *
+import utils.serialize as serialize
 import requests
 import talib
 import numpy as np
@@ -20,6 +22,7 @@ def calcIncPerHour(price1, price2, hours):
 
 oneHour = 60 * 60
 notifyDict = {}
+notifySerialFile = "binance_trend_coin"
 
 def shouldNotify(symbolBase, currentTime):
     global notifyDict
@@ -36,10 +39,11 @@ def notifyAndSetup(symbolBase, currentTime, subject, content):
 
     print("点位提示: ", content)
 
-    # callMe(subject, content)
+    # callSomeone(subject, content, PID_WENJIE)
+    # callSomeone(subject, content, PID_ZIYAN)
     notifyDict[symbolBase] = currentTime
+    serialize.dump(notifyDict, notifySerialFile)
 
-# 按分钟计算
 def monitorTrends(trendCoins):
     for symbolBaseSuffix in trendCoins:
         symbolBase = symbolBaseSuffix[:-2]
@@ -58,10 +62,12 @@ def monitorTrends(trendCoins):
 
             percentage = (diffPrice / targetPrice) * 100
 
+            config_tp = p[7]
+            prefix = "重要: " if config_tp == CFG_TYPE_GOOD else ""
             # print("target: ", targetPrice, ", latestPrice: ", latestPrice, ", pastHours: ", pastHours, ", currentTime: ", currentTime, ", lastTS: ", lastTS, ", inc: ", inc * 10000)
             if percentage < 1.5:
                 if shouldNotify(symbolBase, currentTime):
-                    subject = symbolBase + "已达趋势价格附近"
+                    subject = prefix + symbolBase + "已达趋势价格附近"
                     content = symbolBase + "最新价格: " + str(latestPrice)
                     notifyAndSetup(symbolBase, currentTime, subject, content)
         except requests.RequestException as e:
@@ -73,7 +79,14 @@ def schedule_func(scheduler):
     interval = 5 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
+def initDict():
+    global notifyDict
+    notifyDict = serialize.load(notifySerialFile)
+
+
 if __name__ == "__main__":
+    initDict()
+
     scheduler = sched.scheduler(time.time, time.sleep)
     scheduler.enter(0, 1, schedule_func, (scheduler,))
     scheduler.run()

@@ -35,7 +35,8 @@ def HT(request):
     return JsonResponse(rsp)
 
 def days(request):
-    l = parsePkl.getDays(quant_path)
+    pid = request.GET.get('pid', -1)
+    l = parsePkl.getDays(quant_path, int(pid))
     rsp = { "rsp": l }
     return JsonResponse(rsp)
 

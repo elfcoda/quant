@@ -14,6 +14,8 @@ trendCoinHour_WENJIE = {
         # CFG_TYPE_NORMAL表示当前配置为普通配置，但是已经到平均低点，可以先入场一部分
         # "JASMY_0": [0.01551, 0.01665, 36, 2024, 3, 21, 0, CFG_TYPE_GOOD],
 
+        # 更新的时候注意如果某个币有日线低点加速上涨的趋势，以其他策略单独标注
+
         # please fill in your coins
 }
 
