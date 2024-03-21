@@ -35,10 +35,16 @@ def HT(request):
     return JsonResponse(rsp)
 
 def days(request):
-    pid = request.GET.get('pid', -1)
-    l = parsePkl.getDays(quant_path, int(pid))
+    l = parsePkl.getDaysKLine()
     rsp = { "rsp": l }
     return JsonResponse(rsp)
+
+def fourhours(request):
+    pid = request.GET.get('pid', -1)
+    l = parsePkl.get4Hours(quant_path, int(pid))
+    rsp = { "rsp": l }
+    return JsonResponse(rsp)
+
 
 def test(request):
     l = parsePkl.loadTest(quant_path + "pkl/analyse/test.lst")

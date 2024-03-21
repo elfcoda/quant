@@ -14,4 +14,5 @@ urlpatterns = [
     path("HT/", views.HT, name='HT'),
     path("test/", views.test, name='test'),
     path("days/", views.days, name='days'),
+    path("fourhours/", views.fourhours, name='fourhours'),
 ]

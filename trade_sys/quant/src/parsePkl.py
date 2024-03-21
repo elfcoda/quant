@@ -8,7 +8,7 @@ import talib
 import matplotlib.pyplot as plt
 from marketData import genBars, instSet, barDict
 from cryptoType import getInstDays
-from binance_UI_console_4 import getFocus1HLines
+from binance_UI_console_4 import getFocus4HLines, getFocus1DayLines
 from config import ConfigSingleton
 conf = ConfigSingleton()
 
@@ -547,10 +547,16 @@ def filterWeekendsCrypto(quantPre):
 
     return filterWeekends(li)
 
-def getDays(quantPre, pid):
-    kl = getFocus1HLines(quantPre, pid)
+def get4Hours(quantPre, pid):
+    # 这里拿的4小时线
+    kl = getFocus4HLines(quantPre, pid)
     return kl
     # return getInstDays()
+
+def getDaysKLine():
+    # 这里拿的日线
+    kl = getFocus1DayLines()
+    return kl
 
 def ayalyse():
     coin = "EOS"

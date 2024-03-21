@@ -14,6 +14,7 @@ from binance_comm import *
 from binance_util import *
 from network_binance import request_urls_batch
 from all_coins import coins_wenjie, coins_ziyan
+from high_value import getHighValueCoinsList
 
 aboveCnt = 0
 belowCnt = 0
@@ -236,7 +237,71 @@ def handleRspStrategy1(symbol, kline, kline1h, kline4h):
 
 
 # UI code
-def getFocus1HLines(quantPre, pid = PID_DEFAULT):
+def getFocus1DayLines():
+    targetKLines = []
+
+    urls = []
+
+    symbolBaseList = getHighValueCoinsList()
+
+    for symbolBase in symbolBaseList:
+        symbol = symbolBase + "USDT"
+
+        url = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1d&limit=100"
+        urls.append(url)
+
+    # symbolBaseList
+    # batch request, rsp is ordered
+    rsp = asyncio.run(request_urls_batch(urls))
+
+
+    for i in range(0, len(symbolBaseList)):
+        symbolBase = symbolBaseList[i]
+        kline = eval(rsp[i][1])
+        latest = kline[-1]
+
+        opens = np.array(loadOpenPrice(kline))
+        highs = np.array(loadHighPrice(kline))
+        lows = np.array(loadLowPrice(kline))
+        closes = np.array(loadClosePrice(kline))
+        ma7 = talib.MA(closes, timeperiod=7, matype=0)
+
+        # latest price
+        latestPrice = float(latest[HISTORY_CANDLES_CLOSE])
+        diff = abs(latestPrice - ma7[-1])
+        # print("latest price for ", symbol, ": ", latestPrice, ", diff: ", diff)
+
+        diffPercentage = (float(diff) / float(latestPrice)) * 100
+        # 宽容度会大点
+        diffThreshold = 3
+
+        if diffPercentage < diffThreshold:
+            # 如果价格太低，需要乘以multiply, 否则前端显示不了
+            for item in kline:
+                openPrice = item[1]
+                highestPrice = item[2]
+                lowestPrice = item[3]
+                closePrice = item[4]
+
+                multiply = 100000
+                if float(openPrice) < 1.0:
+                    item[1] = str(float(item[1]) * multiply)
+                    item[2] = str(float(item[2]) * multiply)
+                    item[3] = str(float(item[3]) * multiply)
+                    item[4] = str(float(item[4]) * multiply)
+
+            targetKLines.append([kline, 0, 0, symbolBase])
+
+        # 可以挂插针单对这些币
+        # 查看是否是在上升趋势
+        # if diffPercentage < diffThreshold:
+        #     targetKLines.append([kline1h, 0, 0, symbolBase])
+        # elif diff <= 0:
+        #     targetKLines.append([kline1h, 0, 0, symbolBase])
+
+    return targetKLines
+
+def getFocus4HLines(quantPre, pid = PID_DEFAULT):
     targetKLines = []
 
     urls = []
@@ -299,6 +364,20 @@ def getFocus1HLines(quantPre, pid = PID_DEFAULT):
         diffPercentage = (float(diff) / float(latestPrice)) * 100
         # 宽容度会大点
         diffThreshold = 2
+
+        # 如果价格太低，需要乘以multiply, 否则前端显示不了
+        for item in kline1h:
+            openPrice = item[1]
+            highestPrice = item[2]
+            lowestPrice = item[3]
+            closePrice = item[4]
+
+            multiply = 100000
+            if float(openPrice) < 1.0:
+                item[1] = str(float(item[1]) * multiply)
+                item[2] = str(float(item[2]) * multiply)
+                item[3] = str(float(item[3]) * multiply)
+                item[4] = str(float(item[4]) * multiply)
 
         targetKLines.append([kline1h, 0, 0, symbolBase])
         # 可以挂插针单对这些币
@@ -382,7 +461,7 @@ def initDict():
 if __name__ == "__main__":
     getSpotSymbols()
 
-    # getFocus1HLines(quantPre)
+    # getFocus4HLines(quantPre)
 
     # for symbol in symbolList:
     #     print(symbol)

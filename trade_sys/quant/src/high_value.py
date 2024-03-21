@@ -168,7 +168,7 @@ high_deal_24h = [
     "MASK",
     "JOE",
     "TRU",
-    "ARKN",
+    "ARKM",
     "AEVO",
     "HIFI",
     "CYBER",
@@ -198,6 +198,12 @@ high_deal_24h = [
     "SUN",
 ]
 
+def getHighValueCoinsList():
+    se = set(high_market_value).union(set(high_deal_24h))
+    li = list(se)
+    li = sorted(li)
+
+    return li
 
 if __name__ == "__main__":
     se = set(high_market_value).union(set(high_deal_24h))
