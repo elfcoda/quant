@@ -284,7 +284,7 @@ def getFocus1DayLines():
                 closePrice = item[4]
 
                 multiply = 100000
-                if float(openPrice) < 1.0:
+                if float(openPrice) < 0.0000001:
                     item[1] = str(float(item[1]) * multiply)
                     item[2] = str(float(item[2]) * multiply)
                     item[3] = str(float(item[3]) * multiply)
@@ -373,7 +373,7 @@ def getFocus4HLines(quantPre, pid = PID_DEFAULT):
             closePrice = item[4]
 
             multiply = 100000
-            if float(openPrice) < 1.0:
+            if float(openPrice) < 0.0000001:
                 item[1] = str(float(item[1]) * multiply)
                 item[2] = str(float(item[2]) * multiply)
                 item[3] = str(float(item[3]) * multiply)
