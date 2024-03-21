@@ -73,7 +73,7 @@ def minsBy1d(n):
 
 CFG_TYPE_GOOD = 1
 CFG_TYPE_NORMAL = 2
-# 2小时级别: "SymbolBase_index": [price1, price2, hours, year, mon, day, hour, config_type]
+# 1小时级别: "SymbolBase_index": [price1, price2, hours, year, mon, day, hour, config_type]
 # 表示某个币种后缀跟个下标，这个币种可以配置最多10条线
 trendCoinHour = {
         # 如：对JASMY配置的第一条，第一个价格是0.01551，第二个价格是0.01665，中间一共过了18 * 2小时，第二个价格的时间是2024年3月21日0点
@@ -89,7 +89,6 @@ trendCoinHour = {
         # "_0": [, , , 2024, 3, 11, 4, CFG_TYPE_NORMAL],
 }
 
-# TODO
 trendCoin4h = {
         "KEY": [0.006356, 0.007716, 20, 2024, 3, 12],
 }

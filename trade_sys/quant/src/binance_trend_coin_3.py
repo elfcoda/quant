@@ -12,6 +12,8 @@ import sched
 import time
 import config
 from network_binance import request_urls_batch
+from ziyan import *
+from wenjie import *
 
 def calcIncPerHour(price1, price2, hours):
     return (price2 - price1) / hours
@@ -23,7 +25,7 @@ def shouldNotify(symbolBase, currentTime):
     global notifyDict
 
     previousNotify = 0
-    notifyInterval = 15 * 60
+    notifyInterval = 60 * 60
     # previous notify seconds
     if symbolBase in notifyDict:
         previousNotify = notifyDict[symbolBase]
@@ -38,11 +40,11 @@ def notifyAndSetup(symbolBase, currentTime, subject, content):
     notifyDict[symbolBase] = currentTime
 
 # 按分钟计算
-def monitorTrends():
-    for symbolBaseSuffix in trendCoinHour:
+def monitorTrends(trendCoins):
+    for symbolBaseSuffix in trendCoins:
         symbolBase = symbolBaseSuffix[:-2]
         currentTime = int(time.time())
-        p = trendCoinHour[symbolBaseSuffix]
+        p = trendCoins[symbolBaseSuffix]
         inc = calcIncPerHour(p[0], p[1], p[2])
 
         lastTS = int(config.ConfigSingleton.getHourTS(p[3], p[4], p[5], p[6]) / 1000)
@@ -66,7 +68,8 @@ def monitorTrends():
             print("请求异常:", e)
 
 def schedule_func(scheduler):
-    monitorTrends()
+    monitorTrends(trendCoinHour_WENJIE)
+    monitorTrends(trendCoinHour_ZIYAN)
     interval = 5 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
