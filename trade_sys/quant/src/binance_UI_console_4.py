@@ -45,6 +45,10 @@ def notify(symbol, subject, content):
         callMe(subject, content)
         notifyDict[symbol] = currentTime
 
+# [BTCUSDT] -> [BTC]
+def symbolList2symbolBaseList(sl):
+    return list(map(lambda symbol: symbol[:-4], sl))
+
 def calcAmplitude(o, h, l, c):
     # if c > o:
     #     return (h - l) / l * 100
@@ -66,7 +70,7 @@ def calcAmplitudeList(os, hs, ls, cs, symbolBase, tss):
     if total != 0:
         print("total big amp: ", total)
 
-def handleRsp(symbol, kline, kline1h):
+def handleRspStrategy2(symbol, kline, kline1h, kline4h):
     global aboveCnt
     global belowCnt
 
@@ -76,9 +80,71 @@ def handleRsp(symbol, kline, kline1h):
     # alert latest
 
     latest = kline[-1]
-    amplitude = ((float(latest[HISTORY_CANDLES_HIGH]) / float(latest[HISTORY_CANDLES_LOW])) - 1) * 100
-    if amplitude > 80.0:
-        print("\033[31mamplitude: ", format(amplitude, ".2f"), "%\033[0m")
+
+    closes1h = np.array(loadClosePrice(kline1h))
+    closes4h = np.array(loadClosePrice(kline4h))
+
+    ma7 = talib.MA(closes4h, timeperiod=7, matype=0)
+    # print("latest MA7: ", ma7[-1])
+
+    # latest price
+    latestPrice = float(latest[HISTORY_CANDLES_CLOSE])
+    diff = abs(latestPrice - ma7[-1])
+    # print("latest price for ", symbol, ": ", latestPrice, ", diff: ", diff)
+
+    diffPercentage = (float(diff) / float( ma7[-1])) * 100
+    diffThreshold = 5
+
+    mac1h, macdsignal1h, macdhist1h = talib.MACD(closes1h, fastperiod=12, slowperiod=26, signalperiod=9)
+    mac4h, macdsignal4h, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
+    # print("symbol: ", symbolBase)
+    # print(closes1h[-2], " and ", closes1h[-1])
+    # MACD up
+
+    macd_UP = False
+    if len(macdhist4h) > 5 and macdhist4h[-1] > macdhist4h[-2] > macdhist4h[-3]:
+        macd_UP = True
+
+    # calcAmplitudeList(opens1h, highs1h, lows1h, closes1h, symbolBase, tss1h)
+
+    # 需要在小时初判断
+    # if lows1h[-2] > lows1h[-3]:
+    # 需要在小时结尾判断
+    # if lows1h[-1] > lows1h[-2]:
+    # if macdhist[-1] > macdhist[-2]:
+
+
+    # 需要查看是否在趋势通道里
+    if diffPercentage > diffThreshold:
+        if latestPrice > ma7[-1]:
+            aboveCnt += 1
+            subject = symbolBase + " 4h 乖离率过高，价格大于均线"
+            content = symbolBase + " 4h 乖离率过高，价格大于均线"
+            # notify(symbol, subject, content)
+            # formatPrint2(1, symbolBase, subject, macd_UP)
+        else:
+            belowCnt += 1
+            subject = symbolBase + " 4h 乖离率过高，价格低于均线"
+            content = symbolBase + " 4h 乖离率过高，价格低于均线"
+            # notify(symbol, subject, content)
+            formatPrint2(2, symbolBase, subject, macd_UP)
+
+    # print("aboveCnt: ", aboveCnt, ", belowCnt: ", belowCnt)
+
+
+def handleRspStrategy1(symbol, kline, kline1h, kline4h):
+    global aboveCnt
+    global belowCnt
+
+    symbolBase = symbol[:-4]
+
+    # kline[-1] is the latest one
+    # alert latest
+
+    latest = kline[-1]
+    # amplitude = ((float(latest[HISTORY_CANDLES_HIGH]) / float(latest[HISTORY_CANDLES_LOW])) - 1) * 100
+    # if amplitude > 80.0:
+    #     print("\033[31mamplitude: ", format(amplitude, ".2f"), "%\033[0m")
 
     for item in kline:
         time = utils.formatTS(item[0])
@@ -105,7 +171,7 @@ def handleRsp(symbol, kline, kline1h):
 
     diffPercentage = (float(diff) / float(latestPrice)) * 100
     # 宽容度会大点
-    diffThreshold = 2
+    diffThreshold = 3
 
 
     tss1h = np.array(loadTS(kline1h))
@@ -114,11 +180,17 @@ def handleRsp(symbol, kline, kline1h):
     lows1h = np.array(loadLowPrice(kline1h))
     closes1h = np.array(loadClosePrice(kline1h))
 
-    mac, macdsignal, macdhist = talib.MACD(closes1h, fastperiod=12, slowperiod=26, signalperiod=9)
+    closes4h = np.array(loadClosePrice(kline4h))
+
+    mac1h, macdsignal1h, macdhist1h = talib.MACD(closes1h, fastperiod=12, slowperiod=26, signalperiod=9)
+    mac4h, macdsignal4h, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
     # print("symbol: ", symbolBase)
     # print(closes1h[-2], " and ", closes1h[-1])
     # MACD up
-    # if macdhist[-1] > macdhist[-2]:
+
+    macd_UP = False
+    if len(macdhist4h) > 5 and macdhist4h[-1] > macdhist4h[-2] > macdhist4h[-3]:
+        macd_UP = True
 
     # calcAmplitudeList(opens1h, highs1h, lows1h, closes1h, symbolBase, tss1h)
 
@@ -135,14 +207,14 @@ def handleRsp(symbol, kline, kline1h):
             subject = symbolBase + " 接近MA7"
             content = symbolBase + " 接近MA7"
             # notify(symbol, subject, content)
-            formatPrint(MATypeAbove, symbolBase, subject)
+            formatPrint(MATypeAbove, symbolBase, subject, macd_UP)
         elif diff <= 0:
             # 次优先做
             belowCnt += 1
             subject = symbolBase + " 低于MA7"
             content = symbolBase + " 低于MA7"
             # notify(symbol, subject, content)
-            formatPrint(MATypeBelow, symbolBase, subject)
+            formatPrint(MATypeBelow, symbolBase, subject, macd_UP)
 
 
 # UI code
@@ -154,7 +226,11 @@ def getFocus1HLines():
 
     symbolList1H = []
     focusSet = getFocusSet()
-    for symbolBase in focusSet:
+
+    global symbolList
+    symbolBaseList = symbolList2symbolBaseList(symbolList)
+    # for symbolBase in focusSet:
+    for symbolBase in symbolBaseList:
         symbol = symbolBase + "USDT"
 
         symbolList1H.append(symbolBase)
@@ -206,7 +282,6 @@ def getFocus1HLines():
 
     return targetKLines
 
-
 def getKlines():
     cnt = 0
 
@@ -215,32 +290,41 @@ def getKlines():
     global belowCnt
     aboveCnt = 0
     belowCnt = 0
+    symbolBaseList = symbolList2symbolBaseList(symbolList)
 
     urls = []
     urls1h = []
-    symbolList = []
+    urls4h = []
+    KLineList = []
     focusSet = getFocusSet()
-    for symbolBase in focusSet:
+    for symbolBase in symbolBaseList:
+    # for symbolBase in focusSet:
+        if symbolBase in nonSpotSet or "UP" in symbolBase or "DOWN" in symbolBase or symbolBase in lowAmountSet or symbolBase in lowValueSet:
+            continue
+
         symbol = symbolBase + "USDT"
 
-        symbolList.append(symbolBase)
+        KLineList.append(symbolBase)
         # print("symbol is: ", symbol)
         url = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1d&limit=100"
         urls.append(url)
         url1h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=100"
         urls1h.append(url1h)
-        # url4h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=4h&limit=100"
+        url4h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=4h&limit=100"
+        urls4h.append(url4h)
 
-    # symbolList
+    # KLineList
     # batch request, rsp is ordered
     rsp = asyncio.run(request_urls_batch(urls))
     rsp1h = asyncio.run(request_urls_batch(urls1h))
+    rsp4h = asyncio.run(request_urls_batch(urls4h))
 
-    for i in range(0, len(focusSet)):
-        symbolBase = symbolList[i]
+    for i in range(0, len(KLineList)):
+        symbolBase = KLineList[i]
         kline = eval(rsp[i][1])
         kline1h = eval(rsp1h[i][1])
-        handleRsp(symbolBase + "USDT", kline, kline1h)
+        kline4h = eval(rsp4h[i][1])
+        handleRspStrategy2(symbolBase + "USDT", kline, kline1h, kline4h)
 
     # print("aboveCnt: ", aboveCnt, ", belowCnt: ", belowCnt)
     print("all crypto finished.")

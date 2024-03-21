@@ -93,8 +93,8 @@ def monitorMinutesAmp():
                 amb = abs(high3 - low3) / low3 * 100
                 direction = "上涨" if close3 > open3 else "下跌"
                 if amb > 1.2:
-                    subject = symbolBase + "3m " + direction + "异常, 波动率" + amb + "%"
-                    content = symbolBase + "3m " + direction + "异常, 波动率" + amb + "%"
+                    subject = symbolBase + " 3m " + direction + "异常, 波动率" + str(amb) + "%"
+                    content = symbolBase + " 3m " + direction + "异常, 波动率" + str(amb) + "%"
                     notifyAndSetupComm(nkey, currentTime, subject, content)
 
             nkey15 = symbolBase + "15m"
@@ -102,8 +102,8 @@ def monitorMinutesAmp():
                 amb15 = abs(high15m - low15m) / low15m * 100
                 direction15m = "上涨" if close15m > open15m else "下跌"
                 if amb15 > 3:
-                    subject = symbolBase + "15m " + direction15m + "异常, 波动率" + amb15 + "%"
-                    content = symbolBase + "15m " + direction15m + "异常, 波动率" + amb15 + "%"
+                    subject = symbolBase + " 15m " + direction15m + "异常, 波动率" + str(amb15) + "%"
+                    content = symbolBase + " 15m " + direction15m + "异常, 波动率" + str(amb15) + "%"
                     notifyAndSetupComm(nkey15, currentTime, subject, content)
 
 def schedule_func(scheduler):

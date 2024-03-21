@@ -21,6 +21,10 @@ class ConfigSingleton:
         return int(datetime.timestamp(datetime.strptime(str(year) + "-" + str(mon) + "-" + str(day) + " 00:00:00", "%Y-%m-%d %H:%M:%S"))) * 1000
 
     @staticmethod
+    def getHourTS(year, mon, day, hour):
+        return int(datetime.timestamp(datetime.strptime(str(year) + "-" + str(mon) + "-" + str(day) + " " + str(hour) + ":00:00", "%Y-%m-%d %H:%M:%S"))) * 1000
+
+    @staticmethod
     def getNow():
         return int(datetime.timestamp(datetime.now()) * 1000)
 

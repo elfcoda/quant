@@ -13,17 +13,17 @@ import time
 import config
 from network_binance import request_urls_batch
 
-def calcIncPerDay(price1, price2, days):
-    return (price2 - price1) / days
+def calcIncPerHour(price1, price2, hours):
+    return (price2 - price1) / hours
 
-oneday = 24 * 60 * 60
+oneHour = 60 * 60
 notifyDict = {}
 
 def shouldNotify(symbolBase, currentTime):
     global notifyDict
 
     previousNotify = 0
-    notifyInterval = 1 * 60
+    notifyInterval = 15 * 60
     # previous notify seconds
     if symbolBase in notifyDict:
         previousNotify = notifyDict[symbolBase]
@@ -32,21 +32,22 @@ def shouldNotify(symbolBase, currentTime):
 def notifyAndSetup(symbolBase, currentTime, subject, content):
     global notifyDict
 
-    print(content)
+    print("点位提示: ", content)
 
-    # TODO
     # callMe(subject, content)
     notifyDict[symbolBase] = currentTime
 
+# 按分钟计算
 def monitorTrends():
-    for symbolBase in neddleCoin:
+    for symbolBaseSuffix in trendCoinHour:
+        symbolBase = symbolBaseSuffix[:-2]
         currentTime = int(time.time())
-        p = neddleCoin[symbolBase]
-        inc = calcIncPerDay(p[0], p[1], p[2])
+        p = trendCoinHour[symbolBaseSuffix]
+        inc = calcIncPerHour(p[0], p[1], p[2])
 
-        lastTS = int(config.ConfigSingleton.getDayTS(p[3], p[4], p[5]) / 1000)
-        pastDays = int((currentTime - lastTS) / oneday )
-        targetPrice = pastDays * inc + p[1]
+        lastTS = int(config.ConfigSingleton.getHourTS(p[3], p[4], p[5], p[6]) / 1000)
+        pastHours = int((currentTime - lastTS) / oneHour )
+        targetPrice = pastHours * inc + p[1]
 
         try:
             latestPrice = getLatestPrice(symbolBase)
@@ -55,7 +56,8 @@ def monitorTrends():
 
             percentage = (diffPrice / targetPrice) * 100
 
-            if percentage < 0.5:
+            # print("target: ", targetPrice, ", latestPrice: ", latestPrice, ", pastHours: ", pastHours, ", currentTime: ", currentTime, ", lastTS: ", lastTS, ", inc: ", inc * 10000)
+            if percentage < 1.5:
                 if shouldNotify(symbolBase, currentTime):
                     subject = symbolBase + "已达趋势价格附近"
                     content = symbolBase + "最新价格: " + str(latestPrice)
@@ -65,7 +67,7 @@ def monitorTrends():
 
 def schedule_func(scheduler):
     monitorTrends()
-    interval = 30 * 60
+    interval = 5 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
 if __name__ == "__main__":

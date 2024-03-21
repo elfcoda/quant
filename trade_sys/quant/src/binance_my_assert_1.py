@@ -18,7 +18,7 @@ ASSERT_IDX_MACD_INC = 2
 ASSERT_IDX_MACD_DEC = 3
 myAsserts = {
             "BTC": [100, [31511.0], True, False],
-            "OCEAN": [1.22, [1.17], False, False],
+            "OCEAN": [1.22, [1.2], False, False],
             "PEPE": [200, [0.00000830], False, False]
         }
 
@@ -39,8 +39,7 @@ def notifyAndSetup(nkey, currentTime, subject, content):
 
     print(content)
 
-    # TODO
-    # callMe(subject, content)
+    callMe(subject, content)
     notifyDict[nkey] = currentTime
 
 
@@ -159,6 +158,36 @@ def monitorTrend(symbolBase):
     pass
 
 def monitorAsserts():
+    url_wenjie = "https://raw.githubusercontent.com/elfcoda/conf/main/binance_asserts.py"
+    url_yolanda = "https://raw.githubusercontent.com/yooyolanda/the-big-short/main/conf.py"
+    # url_ziyan = ""
+    urls = [url_wenjie, url_yolanda]
+    # for url in urls:
+    #     try:
+    #         rsp = requests.get(url)
+    #         conf = eval(rsp.text)
+    #         email = conf["info"][0]
+    #         phone = conf["info"][1]
+    #         myAsserts = conf["sub"]
+
+    #         for symbolBase in myAsserts:
+    #             priceList = myAsserts[symbolBase][ASSERT_IDX_NOFITY_PRICES]
+    #             buyPrice = myAsserts[symbolBase][ASSERT_IDX_BUY_PRICE]
+    #             for price in priceList:
+    #                 monitorPrice(symbolBase, price, buyPrice)
+
+    #             # 暂时不需要判断MACD
+    #             # monitorMACD(symbolBase, price)
+
+    #             # monitorNeedle(symbolBase)
+
+    #             monitorMinutesAmp(symbolBase)
+    #     except Exception as e:
+    #         print("发生异常:", e)
+    #         callMe("FATAL: config error", "url: " + url + ", error: " + str(e))
+    #         continue
+
+    global myAsserts
     for symbolBase in myAsserts:
         priceList = myAsserts[symbolBase][ASSERT_IDX_NOFITY_PRICES]
         buyPrice = myAsserts[symbolBase][ASSERT_IDX_BUY_PRICE]
@@ -171,7 +200,6 @@ def monitorAsserts():
         # monitorNeedle(symbolBase)
 
         monitorMinutesAmp(symbolBase)
-
 
 def func():
     print("called per min")
