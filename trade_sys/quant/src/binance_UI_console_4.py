@@ -263,7 +263,8 @@ def getFocus1HLines(quantPre, pid = PID_DEFAULT):
         # print("symbol is: ", symbol)
         url = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1d&limit=100"
         urls.append(url)
-        url1h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=100"
+        # 其实已经改成了4H, 方便查看趋势
+        url1h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=4h&limit=100"
         urls1h.append(url1h)
         # url4h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=4h&limit=100"
 
