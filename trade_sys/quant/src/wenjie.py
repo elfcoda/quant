@@ -3,6 +3,9 @@
 
 from binance_comm import *
 
+STRATEGY_TREND = 0
+STRATEGY_VEGAS = 1
+# 1 bad, 2 mid, 3 good
 #
 # CFG_TYPE_GOOD 以及 CFG_TYPE_NORMAL
 # 1小时级别: "SymbolBase_index": [price1, price2, hours, year, mon, day, hour, config_type]
@@ -12,8 +15,9 @@ trendCoinHour_WENJIE = {
         # 那么在下次到达趋势线附近会发送邮件
         # CFG_TYPE_GOOD表示当前配置是优质配置，到达这附近有大概率会反弹
         # CFG_TYPE_NORMAL表示当前配置为普通配置，但是已经到平均低点，可以先入场一部分
-        # "JASMY_0": [0.01551, 0.01665, 36, 2024, 3, 21, 0, CFG_TYPE_GOOD],
+        # "JASMY_0": [STRATEGY_TREND, 0.01551, 0.01665, 36, 2024, 3, 21, 0, CFG_TYPE_GOOD],
 
+        # "JASMY_1": [STRATEGY_VEGAS] # fst: 2, snd: 3, trd: 1 (不写也可以)
         # 更新的时候注意如果某个币有日线低点加速上涨的趋势，以其他策略单独标注
 
         # please fill in your coins
