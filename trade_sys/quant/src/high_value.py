@@ -198,6 +198,16 @@ high_deal_24h = [
     "SUN",
 ]
 
+def selectVegasFilter():
+    se = set(high_market_value).union(set(high_deal_24h))
+    li = list(se)
+    li = sorted(li)
+    for item in li:
+        print(item)
+
+    return li
+
+
 def getHighValueCoinsList():
     se = set(high_market_value).union(set(high_deal_24h))
     li = list(se)
@@ -206,6 +216,8 @@ def getHighValueCoinsList():
     return li
 
 if __name__ == "__main__":
+    # selectVegasFilter()
+
     se = set(high_market_value).union(set(high_deal_24h))
     li = list(se)
 

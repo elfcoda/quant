@@ -51,7 +51,9 @@ def notify(symbol, subject, content, pid):
         previousNotify = notifyDict[symbol]
     currentTime = int(time.time())
     if currentTime - previousNotify > notifyInterval:
-        # callSomeone(subject, content, pid)
+        # 可以修改成单独的策略，对特定的币种设置特定的均线上下报警范围
+        # callSomeone(subject, content, PID_WENJIE)
+        # callSomeone(subject, content, PID_ZIYAN)
         notifyDict[symbol] = currentTime
         serialize.dump(notifyDict, serialNotifyFile)
 

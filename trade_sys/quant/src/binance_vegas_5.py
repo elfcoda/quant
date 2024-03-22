@@ -1,0 +1,142 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+# 新加坡的IP可以用
+
+import requests
+import talib
+import utils.serialize as serialize
+import numpy as np
+import utils.utils as utils
+import sched
+import time
+from binance_comm import *
+from binance_util import *
+from network_binance import request_urls_batch
+from all_coins import coins_wenjie, coins_ziyan
+from high_value import getHighValueCoinsList
+
+cnt = 0
+firstRun = True
+serialNotifyFile = "binance_vegas_5"
+
+symbolList = []
+notifyDict = {}
+
+
+def notify(symbol, subject, content):
+    global notifyDict
+
+    previousNotify = 0
+    notifyInterval = 24 * 60 * 60
+    # previous notify seconds
+    if symbol in notifyDict:
+        previousNotify = notifyDict[symbol]
+    currentTime = int(time.time())
+    if currentTime - previousNotify > notifyInterval:
+        # callSomeone(subject, content, PID_WENJIE)
+        # callSomeone(subject, content, PID_ZIYAN)
+        notifyDict[symbol] = currentTime
+        serialize.dump(notifyDict, serialNotifyFile)
+
+def handleRspStrategy1(symbol, kline15m, kline1h, kline1d):
+    symbolBase = symbol[:-4]
+
+    latest = kline15m[-1]
+
+    closes = np.array(loadClosePrice(kline15m))
+    closes1h = np.array(loadClosePrice(kline1h))
+    closes1d = np.array(loadClosePrice(kline1d))
+
+    ema144 = talib.EMA(closes, timeperiod = 144)
+    ema169 = talib.EMA(closes, timeperiod = 169)
+    ma7 = talib.MA(closes1d, timeperiod=7, matype=0)
+    # print("latest EMA144: ", ema144[-1])
+
+    # latest price
+    latestPrice = float(latest[HISTORY_CANDLES_CLOSE])
+    diff = abs(latestPrice - ema144[-1])
+    diff1d = abs(latestPrice - ma7[-1])
+    # print("latest price for ", symbol, ": ", latestPrice, ", diff: ", diff)
+
+    diffPercentage = (float(diff) / float(latestPrice)) * 100
+    diffPercentage1d = (float(diff1d) / float(latestPrice)) * 100
+    # 宽容度会大点
+    diffThreshold = 2
+    diffThreshold1d = 1
+
+    global cnt
+    if diffPercentage < diffThreshold:
+        subject = symbolBase + " 接近EMA144"
+        content = symbolBase + " 接近EMA144"
+        if diffPercentage1d < diffThreshold1d:
+            # 接近日线
+            notify(symbol, subject, content)
+            formatPrint3(2, content)
+        else:
+            notify(symbol, subject, content)
+            formatPrint3(3, content)
+        cnt += 1
+
+
+def vegas():
+    global cnt
+    cnt = 0
+
+    symbolBaseList = getHighValueCoinsList()
+
+    urls15m = []
+    urls1h = []
+    urls1d = []
+    KLineList = []
+    for symbolBase in symbolBaseList:
+        if symbolBase in nonSpotSet or "UP" in symbolBase or "DOWN" in symbolBase or symbolBase in lowAmountSet or symbolBase in lowValueSet:
+            continue
+
+        symbol = symbolBase + "USDT"
+
+        KLineList.append(symbolBase)
+        # print("symbol is: ", symbol)
+        url15m = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=15m&limit=300"
+        urls15m.append(url15m)
+        url1h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=300"
+        urls1h.append(url1h)
+        url1d = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1d&limit=100"
+        urls1d.append(url1d)
+
+    # KLineList
+    # batch request, rsp is ordered
+    rsp15m = asyncio.run(request_urls_batch(urls15m))
+    rsp1h = asyncio.run(request_urls_batch(urls1h))
+    rsp1d = asyncio.run(request_urls_batch(urls1d))
+
+    for i in range(0, len(KLineList)):
+        symbolBase = KLineList[i]
+        kline15m = eval(rsp15m[i][1])
+        kline1h = eval(rsp1h[i][1])
+        kline1d = eval(rsp1d[i][1])
+        handleRspStrategy1(symbolBase + "USDT", kline15m, kline1h, kline1d)
+
+    print("total: ", cnt)
+    print("all crypto finished.")
+
+
+# timer, execute func() every interval seconds
+def schedule_func(scheduler):
+    vegas()
+    interval = 5 * 60
+    scheduler.enter(interval, 1, schedule_func, (scheduler,))
+
+def initDict():
+    global notifyDict
+    notifyDict = serialize.load(serialNotifyFile)
+
+
+if __name__ == "__main__":
+    initDict()
+
+    scheduler = sched.scheduler(time.time, time.sleep)
+    scheduler.enter(0, 1, schedule_func, (scheduler,))
+    scheduler.run()
+
+
