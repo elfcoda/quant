@@ -24,7 +24,15 @@ trendCoinHour_ZIYAN = {
     "AR_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 后段符合vages
     "BCH_1": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],  # 最近进入vages线路,但前面有跌出长线
     "BOME_1": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],  # 新币无长线，但15分钟已进入vagas
+    "CFX_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 
+    "CYBER_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 1h线很好
+    "DEXE_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 
+    "FTM_1": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],  # 1h线还可以
     "FTM_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 
+    "GAL_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 
+    "HIFI_1": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],  # 感觉还可以，虽然中间有跌穿，与之前大涨有关
+    # "ICP_1": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],  # 上涨趋势强，在补前面的坑，线后面感觉会成vegas
+    "JUP_1": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],  # 还可以趋势向上，踩点也算准，但间隔较长，当前阶段K线离中线不远
 }
 
 # ziyan = [

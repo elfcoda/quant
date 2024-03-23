@@ -35,11 +35,11 @@ BOME
 BONK
 BTC
 BTTC
-CAKE
-CELO
-CFX
+CAKE            # 线杂乱
+CELO            
+CFX             # 还可以
 CHZ
-CKB
+CKB             # 符合vegas，但上下区间穿越，也跌穿过
 COMP
 CRV
 CYBER
@@ -58,7 +58,7 @@ ENS
 EOS
 ETC
 ETH
-ETHFI
+ETHFI           # 新币，走线不准
 FET
 FIL
 FLOKI
