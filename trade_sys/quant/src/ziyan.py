@@ -23,6 +23,7 @@ trendCoinHour_ZIYAN = {
     "APT_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 点多，间隔小于天
     "AR_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 后段符合vages
     "BCH_1": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],  # 最近进入vages线路,但前面有跌出长线
+    "BOME_1": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],  # 新币无长线，但15分钟已进入vagas
     "FTM_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 
 }
 
