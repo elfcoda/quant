@@ -3,6 +3,9 @@
 
 from binance_comm import *
 
+STRATEGY_TREND = 0
+STRATEGY_VEGAS = 1
+# 1 bad, 2 mid, 3 good
 #
 # CFG_TYPE_GOOD 以及 CFG_TYPE_NORMAL
 # 1小时级别: "SymbolBase_index": [price1, price2, hours, year, mon, day, hour, config_type]
@@ -17,6 +20,10 @@ trendCoinHour_ZIYAN = {
         # 更新的时候注意如果某个币有日线低点加速上涨的趋势，以其他策略单独标注
 
         # please fill in your coins
+    "APT_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 点多，间隔小于天
+    "AR_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 后段符合vages
+    "BCH_1": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],  # 最近进入vages线路,但前面有跌出长线
+    "FTM_1": [STRATEGY_VEGAS, CFG_TYPE_GOOD],  # 
 }
 
 # ziyan = [

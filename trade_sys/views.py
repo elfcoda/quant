@@ -4,6 +4,7 @@ from django.views.generic.detail import DetailView
 
 import sys
 quant_path = '/Users/luwenjie/git/web3/quant/quant/trade_sys/quant/src/'
+# quant_path = '/Users/ziyanguo/Mycode/quant/trade_sys/quant/src/'
 sys.path.append(quant_path)
 
 import parsePkl
