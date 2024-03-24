@@ -69,6 +69,8 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
 
     ema144 = talib.EMA(closes1h, timeperiod = 144)
     ema169 = talib.EMA(closes1h, timeperiod = 169)
+    ema576 = talib.EMA(closes1h, timeperiod = 576)
+    ema676 = talib.EMA(closes1h, timeperiod = 676)
     ma7 = talib.MA(closes1d, timeperiod=7, matype=0)
     # print("latest EMA144: ", ema144[-1])
 
@@ -92,7 +94,7 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
     mac, macdsignal, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
 
     global cnt
-    if diffPercentage < diffThreshold:
+    if diffPercentage < diffThreshold and ema144[-1] > ema576[-1]:
         subject = symbolBase + " 接近1H EMA144"
         content = symbolBase + " 接近1H EMA144"
         if symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
@@ -135,9 +137,10 @@ def vegas():
 
         KLineList.append(symbolBase)
         # print("symbol is: ", symbol)
-        url15m = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=15m&limit=300"
+        url15m = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=15m&limit=700"
         urls15m.append(url15m)
-        url1h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=300"
+        # 1小时有700可以算EMA576和EMA676(最大1000)
+        url1h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=700"
         urls1h.append(url1h)
         url4h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=4h&limit=300"
         urls4h.append(url4h)
