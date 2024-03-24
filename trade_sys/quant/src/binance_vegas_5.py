@@ -37,7 +37,7 @@ def notify(symbol, subject, content):
     currentTime = int(time.time())
     if currentTime - previousNotify > notifyInterval:
         callSomeone(subject, content, PID_WENJIE)
-        # callSomeone(subject, content, PID_ZIYAN)
+        callSomeone(subject, content, PID_ZIYAN)
         # callSomeone(subject, content, PID_YOLANDA)
         notifyDict[symbol] = currentTime
         serialize.dump(notifyDict, serialNotifyFile)
@@ -55,7 +55,6 @@ def filterVegasCoins(configCoins):
             vegasSymbolBaseList.append(symbolBase)
 
     return vegasSymbolBaseList
-
 
 
 def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
