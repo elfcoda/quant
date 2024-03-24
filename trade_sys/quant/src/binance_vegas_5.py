@@ -92,7 +92,7 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
     diffPercentageVegas = (float(diff) / float(latestPrice)) * 100
     diffPercentage1d = (float(diff1d) / float(latestPrice)) * 100
     # 宽容度会大点
-    diffThreshold = 1.2
+    diffThreshold = 1.5
     diffThreshold1dNormal = 1.5
     diffThreshold1dGood = 3
 
@@ -122,7 +122,7 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
         else:
             subject = "普通Vegas币: " + subject
             # notify(symbol, subject, content)
-            # formatPrint3(0, content)
+            formatPrint3(0, content)
 
         cnt += 1
 

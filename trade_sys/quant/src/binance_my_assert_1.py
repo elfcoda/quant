@@ -17,9 +17,9 @@ ASSERT_IDX_NOFITY_PRICES = 1
 ASSERT_IDX_MACD_INC = 2
 ASSERT_IDX_MACD_DEC = 3
 myAsserts = {
-            "BTC": [100, [31511.0], True, False],
-            "OCEAN": [1.22, [1.2], False, False],
-            "PEPE": [200, [0.00000830], False, False]
+            "FTM": [1.035, [], True, False],
+            "MKR": [3090, [], False, False],
+            "SUI": [2.6, [], False, False],
         }
 
 NOTIFY_TYPE_PRICE = 0
@@ -44,7 +44,7 @@ def notifyAndSetup(nkey, currentTime, subject, content):
 
 
 
-def shouldNotify(symbolBase, notifyType, currentTime, nkey, notifyInterval = 1 * 60):
+def shouldNotify(currentTime, nkey, notifyInterval = 30 * 60):
     global notifyDict
 
     previousNotify = 0
@@ -53,17 +53,15 @@ def shouldNotify(symbolBase, notifyType, currentTime, nkey, notifyInterval = 1 *
         previousNotify = notifyDict[nkey]
     return currentTime - previousNotify > notifyInterval
 
-def symbolMACD(symbolBase, price):
+def symbolMACD(symbolBase, monitorPrice):
+    # monitorPrice不想监控就写0
     symbol = symbolBase + "USDT"
-    KLine1H = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=100"
+    KLine1HUrl = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=100"
 
-    response1h = requests.get(KLine1H)
+    response1h = requests.get(KLine1HUrl)
     kline1h = eval(response1h.text)
 
     tss1h = np.array(loadTS(kline1h))
-    opens1h = np.array(loadOpenPrice(kline1h))
-    highs1h = np.array(loadHighPrice(kline1h))
-    lows1h = np.array(loadLowPrice(kline1h))
     closes1h = np.array(loadClosePrice(kline1h))
 
     latestPrice = 1000000
@@ -75,10 +73,10 @@ def symbolMACD(symbolBase, price):
 
     mac, macdsignal, macdhist = talib.MACD(closes1h, fastperiod=12, slowperiod=26, signalperiod=9)
     # MACD down
-    if macdhist[-1] <= macdhist[-2] and latestPrice > price:
+    if macdhist[-1] <= macdhist[-2] and latestPrice > monitorPrice:
         currentTime = int(time.time())
         nkey = getNotifyKey(symbolBase, NOTIFY_TYPE_MACD_DOWN_ABOVE_PRICE)
-        if shouldNotify(symbolBase, NOTIFY_TYPE_MACD_DOWN_ABOVE_PRICE, currentTime, nkey):
+        if shouldNotify(currentTime, nkey):
             subject = symbolBase + "MACD提示"
             content = symbolBase + "小时线MACD下降，并且最新价格在监控价格之上"
             notifyAndSetup(nkey, currentTime, subject, content)
@@ -94,7 +92,7 @@ def monitorPrice(symbolBase, price, buyPrice):
         if percentage < 0.5:
             currentTime = int(time.time())
             nkey = getNotifyKey(symbolBase, NOTIFY_TYPE_PRICE)
-            if shouldNotify(symbolBase, NOTIFY_TYPE_PRICE, currentTime, nkey):
+            if shouldNotify(currentTime, nkey):
                 subject = symbolBase + "监控点位提示"
                 # 低于  高于 成本价
                 content = symbolBase + "最新价格: " + str(latestPrice) + ", 已接近监控点位: " + str(price)
@@ -135,7 +133,7 @@ def monitorMinutesAmp(symbolBase):
         c15m = float(kline15m[-1][4])
 
         nkey = getNotifyKey(symbolBase, NOTIFY_TYPE_BIG_FALL_3M)
-        if shouldNotify(symbolBase, NOTIFY_TYPE_BIG_FALL_3M, currentTime, nkey):
+        if shouldNotify(currentTime, nkey):
             amb = abs(h3m - l3m) / l3m * 100
             direction = "上涨" if c3m > o3m else "下跌"
             if amb > 1.2:
@@ -144,7 +142,7 @@ def monitorMinutesAmp(symbolBase):
                 notifyAndSetup(nkey, currentTime, subject, content)
 
         nkey15 = getNotifyKey(symbolBase, NOTIFY_TYPE_BIG_FALL_15M)
-        if shouldNotify(symbolBase, NOTIFY_TYPE_BIG_FALL_15M, currentTime, nkey15):
+        if shouldNotify(currentTime, nkey15):
             amb15 = abs(h15m - l15m) / l15m * 100
             direction15m = "上涨" if c15m > o15m else "下跌"
             if amb15 > 3:
@@ -158,10 +156,26 @@ def monitorTrend(symbolBase):
     pass
 
 def monitorAsserts():
-    url_wenjie = "https://raw.githubusercontent.com/elfcoda/conf/main/binance_asserts.py"
-    url_yolanda = "https://raw.githubusercontent.com/yooyolanda/the-big-short/main/conf.py"
+    global myAsserts
+    for symbolBase in myAsserts:
+        buyPrice = myAsserts[symbolBase][ASSERT_IDX_BUY_PRICE]
+        priceList = myAsserts[symbolBase][ASSERT_IDX_NOFITY_PRICES]
+        for price in priceList:
+            monitorPrice(symbolBase, price, buyPrice)
+
+        # 暂时不需要判断MACD
+        monitorMACD(symbolBase, 0)
+
+        # monitorNeedle(symbolBase)
+
+        # monitorMinutesAmp(symbolBase)
+
+
+    # url_wenjie = "https://raw.githubusercontent.com/elfcoda/conf/main/binance_asserts.py"
+    # url_yolanda = "https://raw.githubusercontent.com/yooyolanda/the-big-short/main/conf.py"
     # url_ziyan = ""
-    urls = [url_wenjie, url_yolanda]
+    # urls = [url_wenjie, url_yolanda]
+
     # for url in urls:
     #     try:
     #         rsp = requests.get(url)
@@ -187,19 +201,6 @@ def monitorAsserts():
     #         callMe("FATAL: config error", "url: " + url + ", error: " + str(e))
     #         continue
 
-    global myAsserts
-    for symbolBase in myAsserts:
-        priceList = myAsserts[symbolBase][ASSERT_IDX_NOFITY_PRICES]
-        buyPrice = myAsserts[symbolBase][ASSERT_IDX_BUY_PRICE]
-        for price in priceList:
-            monitorPrice(symbolBase, price, buyPrice)
-
-        # 暂时不需要判断MACD
-        # monitorMACD(symbolBase, price)
-
-        # monitorNeedle(symbolBase)
-
-        monitorMinutesAmp(symbolBase)
 
 def func():
     print("called per min")

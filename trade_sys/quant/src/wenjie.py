@@ -15,6 +15,8 @@ trendCoinHour_WENJIE = {
         # CFG_TYPE_NORMAL表示当前配置为普通配置，但是已经到平均低点，可以先入场一部分
         # "JASMY_0": [STRATEGY_TREND, 0.01551, 0.01665, 36, 2024, 3, 21, 0, CFG_TYPE_GOOD],
 
+
+
         # vegas币的配置:
         # "JASMY_1": [STRATEGY_VEGAS] # fst: 2, snd: 3, trd: 1 (不写也可以)
 
