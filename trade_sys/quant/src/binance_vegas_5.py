@@ -38,7 +38,7 @@ def notify(symbol, subject, content):
     if currentTime - previousNotify > notifyInterval:
         callSomeone(subject, content, PID_WENJIE)
         callSomeone(subject, content, PID_ZIYAN)
-        # callSomeone(subject, content, PID_YOLANDA)
+        callSomeone(subject, content, PID_YOLANDA)
         notifyDict[symbol] = currentTime
         serialize.dump(notifyDict, serialNotifyFile)
 
@@ -76,14 +76,20 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
 
     # latest price
     latestPrice = float(latest[HISTORY_CANDLES_CLOSE])
+
     diff = abs(latestPrice - ema144[-1])
+
+    ema576List = ["OP", "SKL"]
+    if symbolBase in ema576List:
+        diff = abs(latestPrice - ema576[-1])
+
     diff1d = abs(latestPrice - ma7[-1])
     # print("latest price for ", symbol, ": ", latestPrice, ", diff: ", diff)
 
-    diffPercentage = (float(diff) / float(latestPrice)) * 100
+    diffPercentageVegas = (float(diff) / float(latestPrice)) * 100
     diffPercentage1d = (float(diff1d) / float(latestPrice)) * 100
     # 宽容度会大点
-    diffThreshold = 2
+    diffThreshold = 1.2
     diffThreshold1dNormal = 1.5
     diffThreshold1dGood = 3
 
@@ -94,7 +100,7 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
     mac, macdsignal, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
 
     global cnt
-    if diffPercentage < diffThreshold and ema144[-1] > ema576[-1]:
+    if diffPercentageVegas < diffThreshold and ema144[-24] > ema576[-24]:
         subject = symbolBase + " 接近1H EMA144"
         content = symbolBase + " 接近1H EMA144"
         if symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
