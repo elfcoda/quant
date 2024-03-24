@@ -17,19 +17,21 @@ trendCoinHour_WENJIE = {
 
         # vegas币的配置:
         # "JASMY_1": [STRATEGY_VEGAS] # fst: 2, snd: 3, trd: 1 (不写也可以)
-        "MASK_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
-        "MATIC_V": [STRATEGY_VEGAS],
-        "MEME_V": [STRATEGY_VEGAS],
+
+        ## 用 ## 注释掉还没开始上涨的vegas
+        ## "MASK_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
+        ## "MATIC_V": [STRATEGY_VEGAS],
+        ## "MEME_V": [STRATEGY_VEGAS],
         "MKR_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
-        "NEO_V": [STRATEGY_VEGAS],
-        "NEXO_V": [STRATEGY_VEGAS],
+        ## "NEO_V": [STRATEGY_VEGAS],
+        ## "NEXO_V": [STRATEGY_VEGAS],
         "OCEAN_V": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],
         "ONE_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
-        "OP_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD], # ema576 676
+        ## "OP_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD], # ema576 676
         "PEPE_V": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],
         "POLYX_V": [STRATEGY_VEGAS, CFG_TYPE_NORMAL],
         "RSR_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
-        "RVN_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
+        ## "RVN_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
         "SAND_V": [STRATEGY_VEGAS],
         "SKL_V": [STRATEGY_VEGAS], # ema576 676
         "SUN_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
@@ -38,16 +40,15 @@ trendCoinHour_WENJIE = {
         "THETA_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
         "TRU_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
         "VANRY_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
-        "VET_V": [STRATEGY_VEGAS],
+        ## "VET_V": [STRATEGY_VEGAS],
         "WAVES_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
         "WBETH_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
-        "WBTC_V": [STRATEGY_VEGAS], # 震荡后爆拉
-        "WIN_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
-        "WOO_V": [STRATEGY_VEGAS],
-        "XEM_V": [STRATEGY_VEGAS],
-        "XTZ_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
-        "YFI_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
-        "ZEC_V": [STRATEGY_VEGAS], # 插针币
+        ## "WIN_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
+        ## "WOO_V": [STRATEGY_VEGAS],
+        ## "XEM_V": [STRATEGY_VEGAS],
+        ## "XTZ_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
+        ## "YFI_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
+        ## "ZEC_V": [STRATEGY_VEGAS], # 插针币
         "ZIL_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
 
         # 更新的时候注意如果某个币有日线低点加速上涨的趋势，以其他策略单独标注

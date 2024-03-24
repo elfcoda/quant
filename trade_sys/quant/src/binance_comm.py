@@ -215,3 +215,5 @@ def shouldNotifyComm(symbolBase, currentTime, nkey, notifyInterval = 1 * 60):
         previousNotify = notifyDictComm[nkey]
     return currentTime - previousNotify > notifyInterval
 
+vegas_excluded_list = [""]
+

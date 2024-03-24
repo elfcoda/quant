@@ -58,13 +58,14 @@ def filterVegasCoins(configCoins):
 
 
 
-def handleRspStrategy1(symbol, kline15m, kline1h, kline1d):
+def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
     symbolBase = symbol[:-4]
 
     latest = kline15m[-1]
 
     closes = np.array(loadClosePrice(kline15m))
     closes1h = np.array(loadClosePrice(kline1h))
+    closes4h = np.array(loadClosePrice(kline4h))
     closes1d = np.array(loadClosePrice(kline1d))
 
     ema144 = talib.EMA(closes1h, timeperiod = 144)
@@ -89,6 +90,8 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline1d):
     vegasSymbolList2 = filterVegasCoins(trendCoinHour_ZIYAN)
     vegasSymbolList.extend(vegasSymbolList2)
 
+    mac, macdsignal, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
+
     global cnt
     if diffPercentage < diffThreshold:
         subject = symbolBase + " 接近1H EMA144"
@@ -98,7 +101,7 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline1d):
             subject = "精选Vegas币: " + subject
             notify(symbol, subject, content)
             formatPrint3(2, content)
-        elif diffPercentage1d < diffThreshold1dNormal:
+        elif diffPercentage1d < diffThreshold1dNormal and macdhist4h[-1] > macdhist4h[-2] and (abs(macdhist4h[-2]) / abs(macdhist4h[-1])) > 1.067:
             # 接近日线
             subject = "普通Vegas币(接近日线): " + subject
             notify(symbol, subject, content)
@@ -119,10 +122,14 @@ def vegas():
 
     urls15m = []
     urls1h = []
+    urls4h = []
     urls1d = []
     KLineList = []
     for symbolBase in symbolBaseList:
         if symbolBase in nonSpotSet or "UP" in symbolBase or "DOWN" in symbolBase or symbolBase in lowAmountSet or symbolBase in lowValueSet:
+            continue
+
+        if symbolBase in vegas_excluded_list:
             continue
 
         symbol = symbolBase + "USDT"
@@ -133,6 +140,8 @@ def vegas():
         urls15m.append(url15m)
         url1h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=300"
         urls1h.append(url1h)
+        url4h = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=4h&limit=300"
+        urls4h.append(url4h)
         url1d = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1d&limit=100"
         urls1d.append(url1d)
 
@@ -140,14 +149,16 @@ def vegas():
     # batch request, rsp is ordered
     rsp15m = asyncio.run(request_urls_batch(urls15m))
     rsp1h = asyncio.run(request_urls_batch(urls1h))
+    rsp4h = asyncio.run(request_urls_batch(urls4h))
     rsp1d = asyncio.run(request_urls_batch(urls1d))
 
     for i in range(0, len(KLineList)):
         symbolBase = KLineList[i]
         kline15m = eval(rsp15m[i][1])
         kline1h = eval(rsp1h[i][1])
+        kline4h = eval(rsp4h[i][1])
         kline1d = eval(rsp1d[i][1])
-        handleRspStrategy1(symbolBase + "USDT", kline15m, kline1h, kline1d)
+        handleRspStrategy1(symbolBase + "USDT", kline15m, kline1h, kline4h, kline1d)
 
     print("total: ", cnt)
     print("all crypto finished.")
