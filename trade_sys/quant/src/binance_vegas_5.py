@@ -15,6 +15,8 @@ from binance_util import *
 from network_binance import request_urls_batch
 from all_coins import coins_wenjie, coins_ziyan
 from high_value import getHighValueCoinsList
+from wenjie import trendCoinHour_WENJIE
+from ziyan import trendCoinHour_ZIYAN
 
 cnt = 0
 firstRun = True
@@ -28,16 +30,33 @@ def notify(symbol, subject, content):
     global notifyDict
 
     previousNotify = 0
-    notifyInterval = 24 * 60 * 60
+    notifyInterval = 6 * 60 * 60
     # previous notify seconds
     if symbol in notifyDict:
         previousNotify = notifyDict[symbol]
     currentTime = int(time.time())
     if currentTime - previousNotify > notifyInterval:
-        # callSomeone(subject, content, PID_WENJIE)
+        callSomeone(subject, content, PID_WENJIE)
         # callSomeone(subject, content, PID_ZIYAN)
+        # callSomeone(subject, content, PID_YOLANDA)
         notifyDict[symbol] = currentTime
         serialize.dump(notifyDict, serialNotifyFile)
+
+def filterVegasCoins(configCoins):
+    vegasSymbolBaseList = []
+
+    for symbolIndex in configCoins:
+        symbolBase = symbolIndex[:-2]
+        p = configCoins[symbolIndex]
+        if p[0] != STRATEGY_VEGAS:
+            continue
+
+        if len(p) >= 2 and p[1] == CFG_TYPE_GOOD:
+            vegasSymbolBaseList.append(symbolBase)
+
+    return vegasSymbolBaseList
+
+
 
 def handleRspStrategy1(symbol, kline15m, kline1h, kline1d):
     symbolBase = symbol[:-4]
@@ -48,8 +67,8 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline1d):
     closes1h = np.array(loadClosePrice(kline1h))
     closes1d = np.array(loadClosePrice(kline1d))
 
-    ema144 = talib.EMA(closes, timeperiod = 144)
-    ema169 = talib.EMA(closes, timeperiod = 169)
+    ema144 = talib.EMA(closes1h, timeperiod = 144)
+    ema169 = talib.EMA(closes1h, timeperiod = 169)
     ma7 = talib.MA(closes1d, timeperiod=7, matype=0)
     # print("latest EMA144: ", ema144[-1])
 
@@ -63,19 +82,32 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline1d):
     diffPercentage1d = (float(diff1d) / float(latestPrice)) * 100
     # 宽容度会大点
     diffThreshold = 2
-    diffThreshold1d = 1
+    diffThreshold1dNormal = 1.5
+    diffThreshold1dGood = 3
+
+    vegasSymbolList = filterVegasCoins(trendCoinHour_WENJIE)
+    vegasSymbolList2 = filterVegasCoins(trendCoinHour_ZIYAN)
+    vegasSymbolList.extend(vegasSymbolList2)
 
     global cnt
     if diffPercentage < diffThreshold:
-        subject = symbolBase + " 接近EMA144"
-        content = symbolBase + " 接近EMA144"
-        if diffPercentage1d < diffThreshold1d:
-            # 接近日线
+        subject = symbolBase + " 接近1H EMA144"
+        content = symbolBase + " 接近1H EMA144"
+        if symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
+            # 接近日线的优质币
+            subject = "精选Vegas币: " + subject
             notify(symbol, subject, content)
             formatPrint3(2, content)
-        else:
+        elif diffPercentage1d < diffThreshold1dNormal:
+            # 接近日线
+            subject = "普通Vegas币(接近日线): " + subject
             notify(symbol, subject, content)
             formatPrint3(3, content)
+        else:
+            subject = "普通Vegas币: " + subject
+            # notify(symbol, subject, content)
+            # formatPrint3(0, content)
+
         cnt += 1
 
 

@@ -20,6 +20,8 @@ async def fetch_all_data(urls):
         pass
 
 # asyncio.run(fetch_all_data())
+STRATEGY_TREND = 0
+STRATEGY_VEGAS = 1
 
 HISTORY_CANDLES_TS = 0
 HISTORY_CANDLES_OPEN = 1

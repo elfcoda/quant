@@ -49,11 +49,16 @@ def monitorTrends(trendCoins):
         symbolBase = symbolBaseSuffix[:-2]
         currentTime = int(time.time())
         p = trendCoins[symbolBaseSuffix]
-        inc = calcIncPerHour(p[0], p[1], p[2])
 
-        lastTS = int(config.ConfigSingleton.getHourTS(p[3], p[4], p[5], p[6]) / 1000)
+        strategy_type = p[0]
+        if strategy_type != STRATEGY_TREND:
+            continue
+
+        inc = calcIncPerHour(p[1], p[2], p[3])
+
+        lastTS = int(config.ConfigSingleton.getHourTS(p[4], p[5], p[6], p[7]) / 1000)
         pastHours = int((currentTime - lastTS) / oneHour )
-        targetPrice = pastHours * inc + p[1]
+        targetPrice = pastHours * inc + p[2]
 
         try:
             latestPrice = getLatestPrice(symbolBase)
@@ -62,7 +67,7 @@ def monitorTrends(trendCoins):
 
             percentage = (diffPrice / targetPrice) * 100
 
-            config_tp = p[7]
+            config_tp = p[8]
             prefix = "重要: " if config_tp == CFG_TYPE_GOOD else ""
             # print("target: ", targetPrice, ", latestPrice: ", latestPrice, ", pastHours: ", pastHours, ", currentTime: ", currentTime, ", lastTS: ", lastTS, ", inc: ", inc * 10000)
             if percentage < 1.5:
