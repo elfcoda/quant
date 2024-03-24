@@ -18,6 +18,9 @@ from high_value import getHighValueCoinsList
 from wenjie import trendCoinHour_WENJIE
 from ziyan import trendCoinHour_ZIYAN
 
+
+# 不同的币种有不同的特性，有些币持续不断地涨，有些币经常横盘，有些币爆拉后暴跌，有些币喜欢插针
+
 cnt = 0
 firstRun = True
 serialNotifyFile = "binance_vegas_5"
@@ -101,7 +104,10 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
 
     global cnt
     if diffPercentageVegas < diffThreshold and ema144[-24] > ema576[-24]:
+        needld_coin_list = ["WAVES", "ZIL"]
         subject = symbolBase + " 接近1H EMA144"
+        if symbolBase in needld_coin_list:
+            subject += "(插针币)"
         content = symbolBase + " 接近1H EMA144"
         if symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
             # 接近日线的优质币
