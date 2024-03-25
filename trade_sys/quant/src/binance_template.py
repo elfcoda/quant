@@ -66,6 +66,8 @@ def schedule_func(scheduler):
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
 def initDict():
+    # serialize.dump({}, serialNotifyFile)
+
     global notifyDict
     notifyDict = serialize.load(serialNotifyFile)
 

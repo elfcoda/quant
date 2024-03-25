@@ -17,8 +17,7 @@ from high_value import getHighValueCoinsList
 from wenjie import trendCoinHour_WENJIE
 from ziyan import trendCoinHour_ZIYAN
 
-# TODO
-serialNotifyFile = ""
+serialNotifyFile = "binance_special_pump"
 cnt = 0
 
 notifyDict = {}
@@ -39,7 +38,7 @@ def notify(symbol, subject, content):
 
 
 def handleRspStrategy(symbol, kline15m, kline1h, kline4h, kline1d):
-    pass
+    print(symbol)
 
 
 def func():
@@ -66,6 +65,8 @@ def schedule_func(scheduler):
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
 def initDict():
+    # serialize.dump({}, serialNotifyFile)
+
     global notifyDict
     notifyDict = serialize.load(serialNotifyFile)
 
