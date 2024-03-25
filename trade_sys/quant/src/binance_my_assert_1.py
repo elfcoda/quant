@@ -14,12 +14,13 @@ from binance_util import callMe
 
 ASSERT_IDX_BUY_PRICE = 0
 ASSERT_IDX_NOFITY_PRICES = 1
-ASSERT_IDX_MACD_INC = 2
-ASSERT_IDX_MACD_DEC = 3
+ASSERT_IDX_MACD_DOWN = 2
+ASSERT_IDX_VEGAS_15 = 3
 myAsserts = {
-            "FTM": [1.035, [], True, False],
-            "MKR": [3090, [], False, False],
-            "SUI": [2.6, [], False, False],
+            "FTM": [1.035, [1.11], False],
+            "MKR": [3090, [3233], False],
+            "SUI": [2.6, [], False],
+            "PEPE": [0.00000750, [0.0000076], False],
         }
 
 NOTIFY_TYPE_PRICE = 0
@@ -164,7 +165,9 @@ def monitorAsserts():
             monitorPrice(symbolBase, price, buyPrice)
 
         # 暂时不需要判断MACD
-        monitorMACD(symbolBase, 0)
+        isMonitorMACDDown = myAsserts[symbolBase][ASSERT_IDX_MACD_DOWN]
+        if isMonitorMACDDown:
+            monitorMACD(symbolBase, 0)
 
         # monitorNeedle(symbolBase)
 

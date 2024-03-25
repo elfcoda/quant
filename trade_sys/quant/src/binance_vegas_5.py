@@ -80,10 +80,13 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
 
     latest = kline15m[-1]
 
-    closes = np.array(loadClosePrice(kline15m))
+    closes15m = np.array(loadClosePrice(kline15m))
     closes1h = np.array(loadClosePrice(kline1h))
     closes4h = np.array(loadClosePrice(kline4h))
     closes1d = np.array(loadClosePrice(kline1d))
+
+    ema15m144 = talib.EMA(closes15m, timeperiod = 144)
+    ema15m169 = talib.EMA(closes15m, timeperiod = 169)
 
     ema144 = talib.EMA(closes1h, timeperiod = 144)
     ema169 = talib.EMA(closes1h, timeperiod = 169)
@@ -98,8 +101,11 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
     diff = abs(latestPrice - ema144[-1])
 
     ema576List = ["OP", "SKL"]
+    ema15m144List = ["ETHFI"]
     if symbolBase in ema576List:
         diff = abs(latestPrice - ema576[-1])
+    elif symbolBase in ema15m144List:
+        diff = abs(latestPrice - ema15m144[-1])
 
     diff1d = abs(latestPrice - ma7[-1])
     # print("latest price for ", symbol, ": ", latestPrice, ", diff: ", diff)
@@ -107,7 +113,7 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
     diffPercentageVegas = (float(diff) / float(latestPrice)) * 100
     diffPercentage1d = (float(diff1d) / float(latestPrice)) * 100
     # 宽容度会大点
-    diffThreshold = 1.5
+    diffThreshold = 2.1
     diffThreshold1dNormal = 1.5
     diffThreshold1dGood = 3
 
@@ -127,8 +133,8 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
         if symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
             # 接近日线的优质币
             subject = "精选Vegas币: " + subject
-            if not inSleepMode():
-                notify(symbol, subject, content)
+            # if not inSleepMode():
+            notify(symbol, subject, content)
             formatPrint3(2, content)
         elif diffPercentage1d < diffThreshold1dNormal and macdhist4h[-1] > macdhist4h[-2] and (abs(macdhist4h[-2]) / abs(macdhist4h[-1])) > 1.067:
             # 接近日线
@@ -198,7 +204,7 @@ def vegas():
 # timer, execute func() every interval seconds
 def schedule_func(scheduler):
     vegas()
-    interval = 15 * 60
+    interval = 5 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
 def initDict():

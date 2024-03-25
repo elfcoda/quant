@@ -17,18 +17,21 @@ from network_binance import request_urls_batch
 from ziyan import *
 from wenjie import *
 
-def calcIncPerHour(price1, price2, hours):
-    return (price2 - price1) / hours
-
 oneHour = 60 * 60
 notifyDict = {}
 notifySerialFile = "binance_trend_coin"
+
+# hourLi: [2024, 3, 21, 0]
+def fromHourList2TS(hourLi):
+    return int(config.ConfigSingleton.getHourTS(hourLi[0], hourLi[1], hourLi[2], hourLi[3]) / 1000)
+
+# def calcIncPerHour(price1, price2, pastHours):
 
 def shouldNotify(symbolBase, currentTime):
     global notifyDict
 
     previousNotify = 0
-    notifyInterval = 60 * 60
+    notifyInterval = 30 * 60
     # previous notify seconds
     if symbolBase in notifyDict:
         previousNotify = notifyDict[symbolBase]
@@ -39,7 +42,7 @@ def notifyAndSetup(symbolBase, currentTime, subject, content):
 
     print("点位提示: ", content)
 
-    # callSomeone(subject, content, PID_WENJIE)
+    callSomeone(subject, content, PID_WENJIE)
     # callSomeone(subject, content, PID_ZIYAN)
     notifyDict[symbolBase] = currentTime
     serialize.dump(notifyDict, notifySerialFile)
@@ -54,11 +57,14 @@ def monitorTrends(trendCoins):
         if strategy_type != STRATEGY_TREND:
             continue
 
-        inc = calcIncPerHour(p[1], p[2], p[3])
+        # In Seconds
+        TS1 = fromHourList2TS(p[2])
+        TS2 = fromHourList2TS(p[4])
+        pastHours = int((TS2 - TS1) / oneHour )
+        inc = (p[3] - p[1]) / pastHours
 
-        lastTS = int(config.ConfigSingleton.getHourTS(p[4], p[5], p[6], p[7]) / 1000)
-        pastHours = int((currentTime - lastTS) / oneHour )
-        targetPrice = pastHours * inc + p[2]
+        pastHours2Now = int((currentTime - TS2) / oneHour )
+        targetPrice = pastHours2Now * inc + p[3]
 
         try:
             latestPrice = getLatestPrice(symbolBase)
@@ -67,10 +73,10 @@ def monitorTrends(trendCoins):
 
             percentage = (diffPrice / targetPrice) * 100
 
-            config_tp = p[8]
+            config_tp = p[5]
             prefix = "重要: " if config_tp == CFG_TYPE_GOOD else ""
-            # print("target: ", targetPrice, ", latestPrice: ", latestPrice, ", pastHours: ", pastHours, ", currentTime: ", currentTime, ", lastTS: ", lastTS, ", inc: ", inc * 10000)
-            if percentage < 1.5:
+            # print("target: ", targetPrice, ", latestPrice: ", latestPrice, ", pastHours2: ", pastHours2Now, ", currentTime: ", currentTime, ", inc: ", inc * 10000)
+            if percentage < 0.5:
                 if shouldNotify(symbolBase, currentTime):
                     subject = prefix + symbolBase + "已达趋势价格附近"
                     content = symbolBase + "最新价格: " + str(latestPrice)
