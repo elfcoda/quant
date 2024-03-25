@@ -6,6 +6,8 @@
 import asyncio
 import httpx
 import requests
+import time
+from datetime import datetime
 
 async def fetch_data(url):
     async with httpx.AsyncClient() as client:
@@ -214,6 +216,21 @@ def shouldNotifyComm(symbolBase, currentTime, nkey, notifyInterval = 1 * 60):
     if nkey in notifyDictComm:
         previousNotify = notifyDictComm[nkey]
     return currentTime - previousNotify > notifyInterval
+
+def inSleepMode():
+    # sleep from 01:00:00
+    startTS = int(datetime.timestamp(datetime.strptime("2024-03-20 01:00:00", "%Y-%m-%d %H:%M:%S")))
+    # sleep for 8 hours
+    periodTS = 8 * 60 * 60
+
+    currentTime = int(time.time())
+    oneDayTS = 24 * 60 * 60
+    passedInDay = (currentTime - startTS) % oneDayTS
+    if passedInDay < periodTS:
+        print("In Sleep Mode")
+        return True
+    else:
+        return False
 
 vegas_excluded_list = [""]
 

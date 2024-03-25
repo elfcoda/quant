@@ -29,21 +29,6 @@ serialNotifyFile = "binance_vegas_5"
 symbolList = []
 notifyDict = {}
 
-def inSleepMode():
-    # sleep from 01:00:00
-    startTS = int(datetime.timestamp(datetime.strptime("2024-03-20 01:00:00", "%Y-%m-%d %H:%M:%S")))
-    # sleep for 8 hours
-    periodTS = 8 * 60 * 60
-
-    currentTime = int(time.time())
-    oneDayTS = 24 * 60 * 60
-    passedInDay = (currentTime - startTS) % oneDayTS
-    if passedInDay < periodTS:
-        print("In Sleep Mode")
-        return True
-    else:
-        return False
-
 def notify(symbol, subject, content):
     global notifyDict
 
@@ -165,9 +150,6 @@ def vegas():
         if symbolBase in nonSpotSet or "UP" in symbolBase or "DOWN" in symbolBase or symbolBase in lowAmountSet or symbolBase in lowValueSet:
             continue
 
-        if symbolBase in vegas_excluded_list:
-            continue
-
         symbol = symbolBase + "USDT"
 
         KLineList.append(symbolBase)
@@ -189,8 +171,15 @@ def vegas():
     rsp4h = asyncio.run(request_urls_batch(urls4h))
     rsp1d = asyncio.run(request_urls_batch(urls1d))
 
+    # side write for other strategies
+    KLinesSideWriteFileName = "klines_side_write"
+    serialize.dump([KLineList, rsp15m, rsp1h, rsp4h, rsp1d], KLinesSideWriteFileName)
+
     for i in range(0, len(KLineList)):
         symbolBase = KLineList[i]
+        if symbolBase in vegas_excluded_list:
+            continue
+
         kline15m = eval(rsp15m[i][1])
         kline1h = eval(rsp1h[i][1])
         kline4h = eval(rsp4h[i][1])
