@@ -139,7 +139,7 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
         else:
             subject = "普通Vegas币: " + subject
             # notify(symbol, subject, content)
-            # formatPrint3(0, content)
+            formatPrint3(0, content)
 
         cnt += 1
 
@@ -198,7 +198,7 @@ def vegas():
 # timer, execute func() every interval seconds
 def schedule_func(scheduler):
     vegas()
-    interval = 5 * 60
+    interval = 15 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
 def initDict():
