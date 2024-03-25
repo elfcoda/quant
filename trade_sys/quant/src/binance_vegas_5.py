@@ -28,6 +28,20 @@ serialNotifyFile = "binance_vegas_5"
 symbolList = []
 notifyDict = {}
 
+def inSleepMode():
+    # sleep from 01:00:00
+    startTS = int(datetime.timestamp(datetime.strptime("2024-03-20 01:00:00", "%Y-%m-%d %H:%M:%S")))
+    # sleep for 8 hours
+    periodTS = 8 * 60 * 60
+
+    currentTime = int(time.time())
+    oneDayTS = 24 * 60 * 60
+    passedInDay = (currentTime - startTS) % oneDayTS
+    if passedInDay < periodTS:
+        print("In Sleep Mode")
+        return True
+    else:
+        return False
 
 def notify(symbol, subject, content):
     global notifyDict
@@ -112,17 +126,19 @@ def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
         if symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
             # 接近日线的优质币
             subject = "精选Vegas币: " + subject
-            notify(symbol, subject, content)
+            if not inSleepMode():
+                notify(symbol, subject, content)
             formatPrint3(2, content)
         elif diffPercentage1d < diffThreshold1dNormal and macdhist4h[-1] > macdhist4h[-2] and (abs(macdhist4h[-2]) / abs(macdhist4h[-1])) > 1.067:
             # 接近日线
             subject = "普通Vegas币(接近日线): " + subject
-            notify(symbol, subject, content)
+            if not inSleepMode():
+                notify(symbol, subject, content)
             formatPrint3(3, content)
         else:
             subject = "普通Vegas币: " + subject
             # notify(symbol, subject, content)
-            formatPrint3(0, content)
+            # formatPrint3(0, content)
 
         cnt += 1
 
