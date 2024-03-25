@@ -10,6 +10,7 @@ import numpy as np
 import utils.utils as utils
 import sched
 import time
+from datetime import datetime
 from binance_comm import *
 from binance_util import *
 from network_binance import request_urls_batch
