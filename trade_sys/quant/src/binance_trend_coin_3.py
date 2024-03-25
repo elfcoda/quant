@@ -40,7 +40,7 @@ def shouldNotify(symbolBase, currentTime):
 def notifyAndSetup(symbolBase, currentTime, subject, content):
     global notifyDict
 
-    print("点位提示: ", content)
+    formatPrint3(2, "点位提示: " + content)
 
     callSomeone(subject, content, PID_WENJIE)
     # callSomeone(subject, content, PID_ZIYAN)
