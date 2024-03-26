@@ -193,7 +193,7 @@ def vegas():
 # timer, execute func() every interval seconds
 def schedule_func(scheduler):
     vegas()
-    interval = 5 * 60
+    interval = 10 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
 def initDict():
