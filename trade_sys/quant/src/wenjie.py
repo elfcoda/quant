@@ -63,7 +63,7 @@ trendCoinHour_WENJIE = {
 
     # Trend List (From binance_special_pump_6.py)
     # "LUNC_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "MAGIC_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
+    "MAGIC_0": [STRATEGY_TREND, 1.0368, [2024, 3, 22, 20], 1.1296, [2024, 3, 25, 20], CFG_TYPE_GOOD],
     # "MANA_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "MANTA_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "MASK_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
