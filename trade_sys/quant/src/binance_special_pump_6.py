@@ -25,7 +25,7 @@ def notify(symbol, subject, content):
     global notifyDict
 
     previousNotify = 0
-    notifyInterval = 15 * 60
+    notifyInterval = 4 * 60 * 60
     # previous notify seconds
     if symbol in notifyDict:
         previousNotify = notifyDict[symbol]
@@ -62,7 +62,7 @@ def handleRspStrategy(symbol, kline15m, kline1h, kline4h, kline1d):
     diffPercentage25 = (float(diff25) / float(latestPrice)) * 100
     diffPercentage99 = (float(diff99) / float(latestPrice)) * 100
     diffThreshold = 5.0
-    diffThreshold4h = 0.3
+    diffThreshold4h = 0.5
 
     global cnt
 
@@ -77,7 +77,7 @@ def handleRspStrategy(symbol, kline15m, kline1h, kline4h, kline1d):
         coins_up_type = COINS_UP_AVE
     mac, macdsignal, macdhist = talib.MACD(closes1d, fastperiod=12, slowperiod=26, signalperiod=9)
     # 要观察突破4小时下跌趋势线
-    if macdhist[-1] > macdhist[-2] and (abs(macdhist[-2]) / abs(macdhist[-1])) > 1.06 and (diffPercentage7_4h < diffThreshold4h): # or diffPercentage5_4h < diffThreshold4h):
+    if macdhist[-1] > macdhist[-2]: #and (abs(macdhist[-2]) / abs(macdhist[-1])) > 1.01 and (diffPercentage7_4h < diffThreshold4h): # or diffPercentage5_4h < diffThreshold4h):
         subject = symbolBase
         if coins_up_type == COINS_UP_AVE:
             subject += "(匀速币)"

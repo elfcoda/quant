@@ -41,26 +41,26 @@ trendCoinHour_ZIYAN = {
     # 请更新以下趋势，如果不存在趋势，忽略它，如果存在，解开注释并填充
     # "1000SATS_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "1INCH_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "AAVE_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "AI_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "ALGO_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "APE_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    "ARB_0": [STRATEGY_TREND, 1.5673, [2024, 3, 23, 4], 1.6746, [2024, 3, 25, 20], CFG_TYPE_GOOD],
-    # "ARKM_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
+    "AAVE_0": [STRATEGY_TREND, 114.46, [2024, 3, 22, 20], 125.52, [2024, 3, 26, 20], CFG_TYPE_GOOD], # ave
+    "AI_0": [STRATEGY_TREND, 1.536, [2024, 3, 21, 0], 1.628, [2024, 3, 25, 0], CFG_TYPE_GOOD],
+    "ALGO_0": [STRATEGY_TREND, 0.2146, [2024, 3, 19, 16], 0.251, [2024, 3, 25, 12], CFG_TYPE_GOOD], # ave
+    "APE_0": [STRATEGY_TREND, 1.695, [2024, 3, 20, 12], 1.891, [2024, 3, 25, 0], CFG_TYPE_GOOD], # ave
+    "ARB_0": [STRATEGY_TREND, 1.4453, [2024, 3, 19, 16], 1.6645, [2024, 3, 27, 0], CFG_TYPE_GOOD],
+    "ARKM_0": [STRATEGY_TREND, 2.236, [2024, 3, 20, 12], 2.6862, [2024, 3, 25, 20], CFG_TYPE_GOOD], # ave
     # "ASTR_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "ATOM_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "AXS_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "BAT_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
+    "ATOM_0": [STRATEGY_TREND, 10.811, [2024, 3, 20, 12], 11.292, [2024, 3, 25, 0], CFG_TYPE_GOOD], # ave
+    "AXS_0": [STRATEGY_TREND, 9.198, [2024, 3, 21, 0], 10.361, [2024, 3, 25, 20], CFG_TYPE_GOOD], # ave
+    "BAT_0": [STRATEGY_TREND, 0.2654, [2024, 3, 21, 0], 0.3042, [2024, 3, 25, 16], CFG_TYPE_GOOD], # ave
     # "BEAMX_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     "BLUR_0": [STRATEGY_TREND, 0.5351, [2024, 3, 21, 0], 0.5644, [2024, 3, 25, 0], CFG_TYPE_GOOD],
     # "BTTC_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "CELO_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "CHZ_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "CRV_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
+    "CRV_0": [STRATEGY_TREND, 0.5865, [2024, 3, 20, 12], 0.6707, [2024, 3, 25, 20], CFG_TYPE_GOOD], # ave
     # "DASH_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "DCR_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "DOT_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "DYDX_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
+    "DYDX_0": [STRATEGY_TREND, 3.179, [2024, 3, 22, 20], 3.273, [2024, 3, 24, 8], CFG_TYPE_GOOD], # ave
     # "DYM_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "EGLD_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "ELF_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
@@ -69,8 +69,9 @@ trendCoinHour_ZIYAN = {
     # "EOS_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "ETC_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "ETH_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
+    "ETHFI_0": [STRATEGY_TREND, 4.4, [2024, 3, 26, 9], 4.644, [2024, 3, 26, 21], CFG_TYPE_GOOD],
     # "FIL_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "FLOW_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
+    "FLOW_0": [STRATEGY_TREND, 1.273, [2024, 3, 25, 1], 1.388, [2024, 3, 26, 22], CFG_TYPE_GOOD], # ave
     # "FTT_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "FXS_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "GAS_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
@@ -84,7 +85,7 @@ trendCoinHour_ZIYAN = {
     # "IOTA_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "JASMY_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "JST_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "KAVA_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
+    "KAVA_0": [STRATEGY_TREND, 0.8233, [2024, 3, 20, 4], 0.8973, [2024, 3, 24, 12], CFG_TYPE_GOOD],
     # "KDA_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "KLAY_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "LINK_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],

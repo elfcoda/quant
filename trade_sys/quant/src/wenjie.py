@@ -35,7 +35,7 @@ trendCoinHour_WENJIE = {
     "TFUEL_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
     "THETA_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
     "TRU_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
-    "VANRY_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
+    # "VANRY_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
 
     "WAVES_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD], # 插针币
     "WBETH_V": [STRATEGY_VEGAS, CFG_TYPE_GOOD],
@@ -67,7 +67,7 @@ trendCoinHour_WENJIE = {
     # "MANA_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "MANTA_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "MASK_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
-    # "MATIC_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
+    "MATIC_0": [STRATEGY_TREND, 0.9856, [2024, 3, 25, 1], 1.026, [2024, 3, 27, 0], CFG_TYPE_GOOD],
     # "MEME_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "MINA_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "NEO_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
@@ -82,6 +82,7 @@ trendCoinHour_WENJIE = {
     # "ROSE_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "RPL_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "RVN_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
+    "RDNT_0": [STRATEGY_TREND, 0.2155, [2023, 10, 17, 0], 0.3073, [2024, 3, 19, 0], CFG_TYPE_GOOD],
     # "SAND_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "SC_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
     # "SEI_0": [STRATEGY_TREND, , [], , [], CFG_TYPE_GOOD],
