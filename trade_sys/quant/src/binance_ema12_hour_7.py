@@ -40,7 +40,7 @@ li1 = []
 li2 = []
 li3 = []
 li4 = []
-def addPrt(lv1, lv2, lv3, symbolBase, content):
+def addPrt(symbolBase, content):
     if symbolBase in lv1:
         li1.append("优先级1: " + content)
     elif symbolBase in lv2:
@@ -92,32 +92,20 @@ def handleRspStrategy(symbol, kline15m, kline1h, kline4h, kline1d):
 
     vegasSymbolList = getHighValueCoinsList()
 
-    mac, macdsignal, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
-    # 买过的 绿色
-    lv1 = [ "MEME", "ID", "INJ", "SUSHI", "DYM", "TWT", "SC", "GNO", "ARKM", "FTM", "MATIC", "XTZ", "FLOW", "GMX", "CRV", "MANTA", "DOT", "CKB", "SHIB"]
-    # 匀速或者加速币 黄色
-    lv2 = [ "AAVE", "ALGO", "APE", "ARKM", "ATOM", "AXS", "BAT", "CRV", "DYDX", "ETHFI", "NEXO", "OP", "RVN", "STORJ", "QKC",
-           "QTUM", "ROSE", "SAND", "SUN", "LUNC", "MANA", "SHIB", "WIN", "XEM", "YFI", "ZEC"]
-    # 其他潜力币 蓝色
-    lv3 = [ "1INCH", "AAVE", "AI", "APE", "ATOM", "AXS", "BAT", "BEAMX", "BLUR", "BTC", "BTTC", "CHZ", "COMP", "CRV",
-            "DASH", "DCR", "DOT", "DYDX", "EGLD", "ELF", "ENS", "EOS", "ETH", "FIL", "FLOW", "FTT", "FXS", "GAS", "GLM",
-            "GLMR", "GNO", "HBAR", "ID", "IMX", "INJ", "IOTA", "JASMY", "JST", "JTO", "KAVA", "KLAY", "LDO", "LINK", "LRC",
-            "MAGIC", "MANA", "MANTA", "MATIC", "MINA", "NEO", "ONE", "OP", "ORDI", "PEPE", "POWR", "QKC", "QTUM", "RPL", "SAND",
-            "SEI", "SHIB", "STORJ", "STRK", "SUN", "SUSHI", "TFUEL", "THETA", "TRX", "TWT", "UNI", "VET", "WBETH", "WBTC", "WLD", "XAI",
-            "XEM", "XLM", "XTZ", "YFI", "ZEC", "ZIL" ]
-
+    mac, macdsignal, macdhist = talib.MACD(closes15m, fastperiod=12, slowperiod=26, signalperiod=9)
 
     global cnt
-    if diffPercentageVegas < 5 and diffPercentage1d < diffThreshold1dGood and (diffPercentage12 < diffThreshold12 or latestPrice < ema12[-1]):
-        cnt += 1
-        subject = symbolBase + " 接近EMA12"
-        content = symbolBase + " 接近EMA12"
-        addPrt(lv1, lv2, lv3, symbolBase, content)
-    elif diffPercentageVegas < 0.7:
-        cnt += 1
-        subject = symbolBase + " 接近EMA144"
-        content = symbolBase + " 接近EMA144"
-        addPrt(lv1, lv2, lv3, symbolBase, content)
+    if macdhist[-1] > macdhist[-2]:   # 在上涨趋势里
+        if diffPercentageVegas < 5 and diffPercentage1d < diffThreshold1dGood and latestPrice < ema12[-1]: # (diffPercentage12 < diffThreshold12 or latestPrice < ema12[-1]):
+            cnt += 1
+            subject = symbolBase + " 接近EMA12"
+            content = symbolBase + " 接近EMA12"
+            addPrt(symbolBase, content)
+        elif diffPercentageVegas < 0.7:
+            cnt += 1
+            subject = symbolBase + " 接近EMA144"
+            content = symbolBase + " 接近EMA144"
+            addPrt(symbolBase, content)
 
 
 def func():
@@ -125,7 +113,7 @@ def func():
     cnt = 0
 
     KLinesSideWriteFileName = "klines_side_write"
-    [KLineList, rsp15m, rsp1h, rsp4h, rsp1d] = serialize.load(KLinesSideWriteFileName)
+    [KLineList, rsp3m, rsp15m, rsp1h, rsp4h, rsp1d] = serialize.load(KLinesSideWriteFileName)
     for i in range(0, len(KLineList)):
         symbolBase = KLineList[i]
         kline15m = eval(rsp15m[i][1])

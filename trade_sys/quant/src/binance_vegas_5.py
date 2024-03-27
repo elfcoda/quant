@@ -60,11 +60,12 @@ def filterVegasCoins(configCoins):
     return vegasSymbolBaseList
 
 
-def handleRspStrategy1(symbol, kline15m, kline1h, kline4h, kline1d):
+def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     symbolBase = symbol[:-4]
 
     latest = kline15m[-1]
 
+    closes3m = np.array(loadClosePrice(kline3m))
     closes15m = np.array(loadClosePrice(kline15m))
     closes1h = np.array(loadClosePrice(kline1h))
     closes4h = np.array(loadClosePrice(kline4h))
@@ -141,6 +142,7 @@ def vegas():
 
     symbolBaseList = getHighValueCoinsList()
 
+    urls3m = []
     urls15m = []
     urls1h = []
     urls4h = []
@@ -154,6 +156,8 @@ def vegas():
 
         KLineList.append(symbolBase)
         # print("symbol is: ", symbol)
+        url3m = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=3m&limit=200"
+        urls3m.append(url3m)
         url15m = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=15m&limit=700"
         urls15m.append(url15m)
         # 1小时有700可以算EMA576和EMA676(最大1000)
@@ -166,6 +170,7 @@ def vegas():
 
     # KLineList
     # batch request, rsp is ordered
+    rsp3m = asyncio.run(request_urls_batch(urls3m))
     rsp15m = asyncio.run(request_urls_batch(urls15m))
     rsp1h = asyncio.run(request_urls_batch(urls1h))
     rsp4h = asyncio.run(request_urls_batch(urls4h))
@@ -173,18 +178,19 @@ def vegas():
 
     # side write for other strategies
     KLinesSideWriteFileName = "klines_side_write"
-    serialize.dump([KLineList, rsp15m, rsp1h, rsp4h, rsp1d], KLinesSideWriteFileName)
+    serialize.dump([KLineList, rsp3m, rsp15m, rsp1h, rsp4h, rsp1d], KLinesSideWriteFileName)
 
     for i in range(0, len(KLineList)):
         symbolBase = KLineList[i]
         if symbolBase in vegas_excluded_list:
             continue
 
+        kline3m = eval(rsp3m[i][1])
         kline15m = eval(rsp15m[i][1])
         kline1h = eval(rsp1h[i][1])
         kline4h = eval(rsp4h[i][1])
         kline1d = eval(rsp1d[i][1])
-        handleRspStrategy1(symbolBase + "USDT", kline15m, kline1h, kline4h, kline1d)
+        handleRspStrategy1(symbolBase + "USDT", kline3m, kline15m, kline1h, kline4h, kline1d)
 
     print("total: ", cnt)
     print("all crypto finished.")

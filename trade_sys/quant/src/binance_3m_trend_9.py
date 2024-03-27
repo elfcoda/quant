@@ -17,7 +17,7 @@ from high_value import getHighValueCoinsList
 from wenjie import trendCoinHour_WENJIE
 from ziyan import trendCoinHour_ZIYAN
 
-serialNotifyFile = "binance_ma99"
+serialNotifyFile = "binance_3m_trend"
 cnt = 0
 
 notifyDict = {}
@@ -137,20 +137,6 @@ if __name__ == "__main__":
     scheduler = sched.scheduler(time.time, time.sleep)
     scheduler.enter(0, 1, schedule_func, (scheduler,))
     scheduler.run()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

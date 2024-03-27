@@ -234,3 +234,16 @@ def inSleepMode():
 
 vegas_excluded_list = [""]
 
+# 买过的 绿色
+lv1 = [ "MEME", "ID", "INJ", "SUSHI", "DYM", "TWT", "SC", "GNO", "ARKM", "FTM", "MATIC", "XTZ", "FLOW", "GMX", "CRV", "MANTA", "DOT", "CKB", "SHIB", "APT", "ETHFI"]
+# 匀速或者加速币 黄色
+lv2 = [ "AAVE", "ALGO", "APE", "ARKM", "ATOM", "AXS", "BAT", "CRV", "DYDX", "ETHFI", "NEXO", "OP", "RVN", "STORJ", "QKC",
+       "QTUM", "ROSE", "SAND", "SUN", "LUNC", "MANA", "SHIB", "WIN", "XEM", "YFI", "ZEC"]
+# 其他潜力币 蓝色
+lv3 = [ "1INCH", "AAVE", "AI", "APE", "ATOM", "AXS", "BAT", "BEAMX", "BLUR", "BTC", "BTTC", "CHZ", "COMP", "CRV",
+        "DASH", "DCR", "DOT", "DYDX", "EGLD", "ELF", "ENS", "EOS", "ETH", "FIL", "FLOW", "FTT", "FXS", "GAS", "GLM",
+        "GLMR", "GNO", "HBAR", "ID", "IMX", "INJ", "IOTA", "JASMY", "JST", "JTO", "KAVA", "KLAY", "LDO", "LINK", "LRC",
+        "MAGIC", "MANA", "MANTA", "MATIC", "MINA", "NEO", "ONE", "OP", "ORDI", "PEPE", "POWR", "QKC", "QTUM", "RPL", "SAND",
+        "SEI", "SHIB", "STORJ", "STRK", "SUN", "SUSHI", "TFUEL", "THETA", "TRX", "TWT", "UNI", "VET", "WBETH", "WBTC", "WLD", "XAI",
+        "XEM", "XLM", "XTZ", "YFI", "ZEC", "ZIL" ]
+

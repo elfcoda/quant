@@ -17,10 +17,12 @@ ASSERT_IDX_NOFITY_PRICES = 1
 ASSERT_IDX_MACD_DOWN = 2
 ASSERT_IDX_VEGAS_15 = 3
 myAsserts = {
-            "FTM": [1.035, [1.11], False],
-            "MKR": [3090, [3233], False],
-            "SUI": [2.6, [], False],
-            "PEPE": [0.00000750, [0.0000076], False],
+            # "FTM": [1.035, [1.11], False],
+            # "MKR": [3090, [3233], False],
+            # "SUI": [2.6, [], False],
+            # "PEPE": [0.00000750, [0.0000076], False],
+            # "FLOW": [1.433, [], True],
+            # "XTZ": [1.363, [], True],
         }
 
 NOTIFY_TYPE_PRICE = 0
@@ -45,7 +47,7 @@ def notifyAndSetup(nkey, currentTime, subject, content):
 
 
 
-def shouldNotify(currentTime, nkey, notifyInterval = 30 * 60):
+def shouldNotify(currentTime, nkey, notifyInterval = 10 * 60):
     global notifyDict
 
     previousNotify = 0
@@ -57,13 +59,13 @@ def shouldNotify(currentTime, nkey, notifyInterval = 30 * 60):
 def symbolMACD(symbolBase, monitorPrice):
     # monitorPrice不想监控就写0
     symbol = symbolBase + "USDT"
-    KLine1HUrl = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=100"
+    KLineUrl = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=15m&limit=100"
 
-    response1h = requests.get(KLine1HUrl)
-    kline1h = eval(response1h.text)
+    response = requests.get(KLineUrl)
+    kline = eval(response.text)
 
-    tss1h = np.array(loadTS(kline1h))
-    closes1h = np.array(loadClosePrice(kline1h))
+    tss1h = np.array(loadTS(kline))
+    closes = np.array(loadClosePrice(kline))
 
     latestPrice = 1000000
     try:
@@ -72,7 +74,7 @@ def symbolMACD(symbolBase, monitorPrice):
         print("请求异常:", e)
 
 
-    mac, macdsignal, macdhist = talib.MACD(closes1h, fastperiod=12, slowperiod=26, signalperiod=9)
+    mac, macdsignal, macdhist = talib.MACD(closes, fastperiod=12, slowperiod=26, signalperiod=9)
     # MACD down
     if macdhist[-1] <= macdhist[-2] and latestPrice > monitorPrice:
         currentTime = int(time.time())
@@ -164,7 +166,6 @@ def monitorAsserts():
         for price in priceList:
             monitorPrice(symbolBase, price, buyPrice)
 
-        # 暂时不需要判断MACD
         isMonitorMACDDown = myAsserts[symbolBase][ASSERT_IDX_MACD_DOWN]
         if isMonitorMACDDown:
             monitorMACD(symbolBase, 0)

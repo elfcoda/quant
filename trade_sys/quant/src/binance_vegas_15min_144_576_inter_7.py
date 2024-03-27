@@ -62,7 +62,7 @@ def func():
     cnt = 0
 
     KLinesSideWriteFileName = "klines_side_write"
-    [KLineList, rsp15m, rsp1h, rsp4h, rsp1d] = serialize.load(KLinesSideWriteFileName)
+    [KLineList, rsp3m, rsp15m, rsp1h, rsp4h, rsp1d] = serialize.load(KLinesSideWriteFileName)
     for i in range(0, len(KLineList)):
         symbolBase = KLineList[i]
         kline15m = eval(rsp15m[i][1])
