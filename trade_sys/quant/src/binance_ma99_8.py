@@ -17,7 +17,7 @@ from high_value import getHighValueCoinsList
 from wenjie import trendCoinHour_WENJIE
 from ziyan import trendCoinHour_ZIYAN
 
-serialNotifyFile = "binance_ema12_hour"
+serialNotifyFile = "binance_ma99"
 cnt = 0
 
 notifyDict = {}
@@ -65,34 +65,23 @@ def handleRspStrategy(symbol, kline15m, kline1h, kline4h, kline1d):
 
     latest = kline15m[-1]
 
-    closes15m = np.array(loadClosePrice(kline15m))
     closes1h = np.array(loadClosePrice(kline1h))
     closes4h = np.array(loadClosePrice(kline4h))
     closes1d = np.array(loadClosePrice(kline1d))
+    mac, macdsignal, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
 
-    ema12 = talib.EMA(closes1h, timeperiod = 12)
-    ema144 = talib.EMA(closes1h, timeperiod = 144)
-    ma7 = talib.MA(closes1d, timeperiod=7, matype=0)
+    ma99 = talib.MA(closes1h, timeperiod=99, matype=0)
     # print("latest EMA144: ", ema144[-1])
 
     # latest price
     latestPrice = float(latest[HISTORY_CANDLES_CLOSE])
 
-    diff144 = abs(latestPrice - ema144[-1])
-    diff12 = abs(latestPrice - ema12[-1])
-    diff7 = abs(latestPrice - ma7[-1])
+    diff99 = abs(latestPrice - ma99[-1])
     # print("latest price for ", symbol, ": ", latestPrice, ", diff: ", diff)
 
-    diffPercentageVegas = (float(diff144) / float(latestPrice)) * 100
-    diffPercentage12 = (float(diff12) / float(latestPrice)) * 100
-    diffPercentage1d = (float(diff7) / float(latestPrice)) * 100
+    diffPercentage = (float(diff99) / float(latestPrice)) * 100
     # 宽容度会大点
-    diffThreshold12 = 0.5
-    diffThreshold1dGood = 3.5
 
-    vegasSymbolList = getHighValueCoinsList()
-
-    mac, macdsignal, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
     # 买过的 绿色
     lv1 = [ "MEME", "ID", "INJ", "SUSHI", "DYM", "TWT", "SC", "GNO", "ARKM", "FTM", "MATIC", "XTZ", "FLOW", "GMX", "CRV", "MANTA", "DOT", "CKB", "SHIB"]
     # 匀速或者加速币 黄色
@@ -108,15 +97,10 @@ def handleRspStrategy(symbol, kline15m, kline1h, kline4h, kline1d):
 
 
     global cnt
-    if diffPercentageVegas < 5 and diffPercentage1d < diffThreshold1dGood and (diffPercentage12 < diffThreshold12 or latestPrice < ema12[-1]):
+    if diffPercentage < 2 or latestPrice < ma99[-1]:
         cnt += 1
-        subject = symbolBase + " 接近EMA12"
-        content = symbolBase + " 接近EMA12"
-        addPrt(lv1, lv2, lv3, symbolBase, content)
-    elif diffPercentageVegas < 0.7:
-        cnt += 1
-        subject = symbolBase + " 接近EMA144"
-        content = symbolBase + " 接近EMA144"
+        subject = symbolBase + " 接近MA99"
+        content = symbolBase + " 接近MA99"
         addPrt(lv1, lv2, lv3, symbolBase, content)
 
 
