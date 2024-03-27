@@ -60,36 +60,44 @@ def forPrt():
     for it in li1:
         formatPrint3(2, it)
 
-def handleRspStrategy(symbol, kline15m, kline1h, kline4h, kline1d):
+def handleRspStrategy(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     symbolBase = symbol[:-4]
 
     latest = kline15m[-1]
 
+    closes3m = np.array(loadClosePrice(kline3m))
     closes1h = np.array(loadClosePrice(kline1h))
     closes4h = np.array(loadClosePrice(kline4h))
     closes1d = np.array(loadClosePrice(kline1d))
     mac, macdsignal, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
 
-    ma99 = talib.MA(closes1h, timeperiod=99, matype=0)
-    # print("latest EMA144: ", ema144[-1])
+    ema12 = talib.EMA(closes3m, timeperiod = 12)
 
     # latest price
     latestPrice = float(latest[HISTORY_CANDLES_CLOSE])
 
-    diff99 = abs(latestPrice - ma99[-1])
-    # print("latest price for ", symbol, ": ", latestPrice, ", diff: ", diff)
-
-    diffPercentage = (float(diff99) / float(latestPrice)) * 100
+    ma7 = talib.MA(closes1d, timeperiod=7, matype=0)
+    diff7 = abs(latestPrice - ma7[-1])
+    diffPercentage = (float(diff7) / float(latestPrice)) * 100
     # 宽容度会大点
 
-
     global cnt
-    if diffPercentage < 0.35 or latestPrice < ma99[-1]:
+    if diffPercentage < 5:
         cnt += 1
-        subject = symbolBase + " 接近MA99"
-        content = symbolBase + " 接近MA99"
-        addPrt(symbolBase, content)
 
+        # 具体大趋势看大饼
+
+        # ema12 down
+        # if ema12[-1] < ema12[-2] < ema12[-3] < ema12[-4] < ema12[-5] < ema12[-6] < ema12[-7] < ema12[-8] < ema12[-9] < ema12[-10] < ema12[-11] < ema12[-12]:
+        #     subject = symbolBase + " 3m EMA12下降"
+        #     content = symbolBase + " 3m EMA12下降"
+        #     addPrt(symbolBase, content)
+
+        # ema12 up
+        if ema12[-1] > ema12[-2] > ema12[-3] > ema12[-4] > ema12[-5] > ema12[-6] > ema12[-7] > ema12[-8]: # > ema12[-9] > ema12[-10] > ema12[-11] > ema12[-12]:
+            subject = symbolBase + " 3m EMA12上升"
+            content = symbolBase + " 3m EMA12上升"
+            addPrt(symbolBase, content)
 
 def func():
     global cnt
@@ -99,11 +107,12 @@ def func():
     [KLineList, rsp3m, rsp15m, rsp1h, rsp4h, rsp1d] = serialize.load(KLinesSideWriteFileName)
     for i in range(0, len(KLineList)):
         symbolBase = KLineList[i]
+        kline3m = eval(rsp3m[i][1])
         kline15m = eval(rsp15m[i][1])
         kline1h = eval(rsp1h[i][1])
         kline4h = eval(rsp4h[i][1])
         kline1d = eval(rsp1d[i][1])
-        handleRspStrategy(symbolBase + "USDT", kline15m, kline1h, kline4h, kline1d)
+        handleRspStrategy(symbolBase + "USDT", kline3m, kline15m, kline1h, kline4h, kline1d)
 
     forPrt()
 
