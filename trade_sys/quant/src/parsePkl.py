@@ -553,9 +553,9 @@ def get4Hours(quantPre, pid):
     return kl
     # return getInstDays()
 
-def getDaysKLine():
+def getDaysKLine(quant_path):
     # 这里拿的日线
-    kl = getFocus1DayLines()
+    kl = getFocus1DayLines(quant_path)
     return kl
 
 def ayalyse():

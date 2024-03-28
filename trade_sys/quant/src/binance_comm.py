@@ -246,4 +246,26 @@ lv3 = [ "1INCH", "AAVE", "AI", "APE", "ATOM", "AXS", "BAT", "BEAMX", "BLUR", "BT
         "MAGIC", "MANA", "MANTA", "MATIC", "MINA", "NEO", "ONE", "OP", "ORDI", "PEPE", "POWR", "QKC", "QTUM", "RPL", "SAND",
         "SEI", "SHIB", "STORJ", "STRK", "SUN", "SUSHI", "TFUEL", "THETA", "TRX", "TWT", "UNI", "VET", "WBETH", "WBTC", "WLD", "XAI",
         "XEM", "XLM", "XTZ", "YFI", "ZEC", "ZIL" ]
+# 4kw ~ 4亿, 还没涨过的
+lowValuesCoins = [
+        "HARD", "VITE", "PSG", "WING", "BAR", "DOCK", "ALPACA", "AMB", "KP3R", "ADX", "VOXEL", "BURGER", "VIDT", "FIS", "AVA", "COS", "CHESS", "CREAM", "QUICK", "KEY", "BSW",
+        "KMD", "AEUR", "FIDA", "BEL", "UNFI", "LOKA", "LIT", "IRIS", "UTK", "MDX", "COMBO",
+        "ALCX", "REEF", "MLN", "DEGO", "FUN", "FLM", "MDT", "DIA", "ORN", "IDEX", "AERGO", "LEVER", "BETA", "DATA", "PDA", "ATA", "WAN", "GHST", "WNXM", "NULS",
+        "PERP", "VIC", "FORTH", "REN", "XVG", "CTXC", "TLM", "QKC", "HIGH", "MBL", "FRONT", "LTO", "TKO", "NKN", "POLS", "CLV", "WRX", "STMX", "QI", "OGN",
+        "ERN", "CTK", "AGLD", "MBOX", "SPELL", "RARE", "BAKE", "ALICE", "LQTY", "PHB", "ARDR", "BADGER", "GTC", "DAR", "ALPHA", "LOOM", "MTL", "HIFI", "STG",
+        "STEEM", "OMG", "GNS", "SUN", "OXT", "WIN", "RDNT", "STPT", "DODO", "ONG", "KNC", "RAD", "MAV", "PUNDIX", "HFT", "REQ", "ACA", "STRAX", "BLZ",
+        "TRU", "MOVR", "SNT", "ARK", "DENT", "SCRT", "PEOPLE", "BNX", "HOOK", "PHA", "POWR", "PYR", "ZEN", "HIVE", "SYS", "CVC", "XNO", "NFP", "DGB", "TRB",
+        "NMR", "ACE", "SYN", "REI", "CTSI", "SLP", "USTC", "LSK", "CYBER", "XVS", "CELR", "AI", "IOST", "PROM", "IQ", "RLC", "RIF", "DUSK", "POND", "BAL",
+        "SXP", "MAGIC", "C98", "COTI", "EDU", "BAND", "ONT", "ACH", "VTHO", "VANRY",
+        # 再加点中等市值的
+        "CRV", "MANTA", "NEXO", "ENJ", "OCEAN", "PENDLE", "ENS", "IOTX", "1INCH", "FTT", "BOME", "ID", "LUNA", "CELO", "SUPER", "COMP", "RAY", "LPT", "RPL", "ZIL", "FXS", "HOT", "SSV", "PIXEL",
+        "TWT", "METIS", "ALT", "GMT", "LRC", "SC", "OM", "SKL", "TFUEL", "ILV", "FLUX", "GAL", "GLM", "ZEC", "ETHFI", "ANKR", "BAT", "AMP", "GLMR", "GMX", "QTUM", "ELF", "GAS", "MASK",
+        "XEM", "ONE", "MEME", "DASH", "WAVES", "SUSHI", "DCR", "KDA", "PAXG", "ARKM", "DEXE" ]
 
+
+bigAmpCoins = ["REI", "FOR", "BOND", "AEVO", "CLV", "ETHFI", "WAN", "TRU"]
+
+def isInTrendUp(ema1h_n):
+    if ema1h_n[-2] > ema1h_n[-4]  > ema1h_n[-6] > ema1h_n[-8] > ema1h_n[-10] > ema1h_n[-12] > ema1h_n[-14] > ema1h_n[-16] > ema1h_n[-18]: # > ema1h_n[-20] > ema1h_n[-22] > ema1h_n[-24]:
+        return True
+    return False

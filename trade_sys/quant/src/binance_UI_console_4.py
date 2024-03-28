@@ -237,9 +237,56 @@ def handleRspStrategy1(symbol, kline, kline1h, kline4h):
             notify(symbol, subject, content, pid)
             formatPrint3(tp + 1, subject)
 
+# TODO
+# 测试拿小时的
+def getFocus1DayLines(quant_path):
+    targetKLines = []
 
+    urls = []
+
+    # symbolBaseList = lowValuesCoins
+    # symbolBaseList = serialize.load(quant_path + "LowValueEMA7_UI")
+    # symbolBaseList = serialize.load(quant_path + "vegas_UI")
+    symbolBaseList = serialize.load(quant_path + "high_amp_UI")
+    # symbolBaseList = bigAmpCoins
+
+    for symbolBase in symbolBaseList:
+        symbol = symbolBase + "USDT"
+
+        url = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=500"
+        urls.append(url)
+
+    # symbolBaseList
+    # batch request, rsp is ordered
+    rsp = asyncio.run(request_urls_batch(urls))
+
+
+    for i in range(0, len(symbolBaseList)):
+        symbolBase = symbolBaseList[i]
+        kline = eval(rsp[i][1])
+
+        if True:
+            # 如果价格太低，需要乘以multiply, 否则前端显示不了
+            for item in kline:
+                openPrice = item[1]
+                highestPrice = item[2]
+                lowestPrice = item[3]
+                closePrice = item[4]
+
+                multiply = 10000
+                if float(openPrice) < 0.1:
+                    item[1] = str(float(item[1]) * multiply)
+                    item[2] = str(float(item[2]) * multiply)
+                    item[3] = str(float(item[3]) * multiply)
+                    item[4] = str(float(item[4]) * multiply)
+
+            targetKLines.append([kline, 0, 0, symbolBase])
+
+    return targetKLines
+
+# TODO
 # UI code
-def getFocus1DayLines():
+def getFocus1DayLines_xxx(quant_path):
     targetKLines = []
 
     urls = []

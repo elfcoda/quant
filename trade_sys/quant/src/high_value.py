@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+from binance_comm import *
+
 # 4亿以上市值
 high_market_value = [
     "BTC",
@@ -207,6 +209,12 @@ def selectVegasFilter():
 
     return li
 
+def getAllCoinsList():
+    se = set(high_market_value).union(set(high_deal_24h)).union(set(bigAmpCoins)).union(set(lowValuesCoins))
+    li = list(se)
+    li = sorted(li)
+
+    return li
 
 def getHighValueCoinsList():
     se = set(high_market_value).union(set(high_deal_24h))

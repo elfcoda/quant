@@ -15,7 +15,7 @@ from binance_comm import *
 from binance_util import *
 from network_binance import request_urls_batch
 from all_coins import coins_wenjie, coins_ziyan
-from high_value import getHighValueCoinsList
+from high_value import getHighValueCoinsList, getAllCoinsList
 from wenjie import trendCoinHour_WENJIE
 from ziyan import trendCoinHour_ZIYAN
 
@@ -25,9 +25,25 @@ from ziyan import trendCoinHour_ZIYAN
 cnt = 0
 firstRun = True
 serialNotifyFile = "binance_vegas_5"
+tmpList = []
 
 symbolList = []
 notifyDict = {}
+def getSpotSymbols():
+    global symbolList
+    url = 'https://api.binance.com/api/v3/exchangeInfo'
+    response = requests.get(url)
+    if response.status_code == 200:
+        exchange_info = response.json()
+        symbols = exchange_info['symbols']
+        for symbol in symbols:
+            if symbol["quoteAsset"] == "USDT":
+                # BTCUSDT, ETHUSDT
+                symbolList.append(symbol["symbol"])
+
+# [BTCUSDT] -> [BTC]
+def symbolList2symbolBaseList(sl):
+    return list(map(lambda symbol: symbol[:-4], sl))
 
 def notify(symbol, subject, content):
     global notifyDict
@@ -99,7 +115,7 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     diffPercentageVegas = (float(diff) / float(latestPrice)) * 100
     diffPercentage1d = (float(diff1d) / float(latestPrice)) * 100
     # 宽容度会大点
-    diffThreshold = 2.1
+    diffThreshold = 10
     diffThreshold1dNormal = 1.5
     diffThreshold1dGood = 3
 
@@ -107,30 +123,33 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     vegasSymbolList2 = filterVegasCoins(trendCoinHour_ZIYAN)
     vegasSymbolList.extend(vegasSymbolList2)
 
-    mac, macdsignal, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
+    mac4h, macdsignal4h, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
+    mac1h, macdsignal1h, macdhist1h = talib.MACD(closes1h, fastperiod=12, slowperiod=26, signalperiod=9)
 
     global cnt
-    if diffPercentageVegas < diffThreshold and ema144[-24] > ema576[-24]:
-        needld_coin_list = ["WAVES", "ZIL"]
-        subject = symbolBase + " 接近1H EMA144"
-        if symbolBase in needld_coin_list:
-            subject += "(插针币)"
-        content = symbolBase + " 接近1H EMA144"
+    global tmpList
+    # 刚跌完，去除此条件
+    # and ema144[-2] > ema576[-2]
+    # 观察是否突破趋势
+    if diffPercentageVegas < diffThreshold and macdhist1h[-1] > 0 and macdhist1h[-2] < 0:
+        tmpList.append(symbolBase)
+        subject = symbolBase + " 接近1H EMA144 偏离" + format(diffPercentageVegas, ".2f")
+        content = symbolBase + " 接近1H EMA144 偏离" + format(diffPercentageVegas, ".2f")
         if symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
             # 接近日线的优质币
             subject = "精选Vegas币: " + subject
             # if not inSleepMode():
             notify(symbol, subject, content)
             formatPrint3(2, content)
-        elif diffPercentage1d < diffThreshold1dNormal and macdhist4h[-1] > macdhist4h[-2] and (abs(macdhist4h[-2]) / abs(macdhist4h[-1])) > 1.067:
+        elif diffPercentage1d < diffThreshold1dNormal: # and macdhist4h[-1] > macdhist4h[-2] and (abs(macdhist4h[-2]) / abs(macdhist4h[-1])) > 1.067:
             # 接近日线
             subject = "普通Vegas币(接近日线): " + subject
-            if not inSleepMode():
-                notify(symbol, subject, content)
+            # if not inSleepMode():
+            notify(symbol, subject, content)
             formatPrint3(3, content)
         else:
             subject = "普通Vegas币: " + subject
-            # notify(symbol, subject, content)
+            notify(symbol, subject, content)
             formatPrint3(0, content)
 
         cnt += 1
@@ -140,7 +159,11 @@ def vegas():
     global cnt
     cnt = 0
 
-    symbolBaseList = getHighValueCoinsList()
+    symbolBaseList = getAllCoinsList()
+    print("total coins: ", len(symbolBaseList))
+
+    # 临时改成做所有币种
+    global symbolList
 
     urls3m = []
     urls15m = []
@@ -168,6 +191,7 @@ def vegas():
         url1d = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1d&limit=100"
         urls1d.append(url1d)
 
+    print("downloading...")
     # KLineList
     # batch request, rsp is ordered
     rsp3m = asyncio.run(request_urls_batch(urls3m))
@@ -175,6 +199,7 @@ def vegas():
     rsp1h = asyncio.run(request_urls_batch(urls1h))
     rsp4h = asyncio.run(request_urls_batch(urls4h))
     rsp1d = asyncio.run(request_urls_batch(urls1d))
+    print("downloaded")
 
     # side write for other strategies
     KLinesSideWriteFileName = "klines_side_write"
@@ -193,22 +218,29 @@ def vegas():
         handleRspStrategy1(symbolBase + "USDT", kline3m, kline15m, kline1h, kline4h, kline1d)
 
     print("total: ", cnt)
+    serialize.dump(tmpList, "vegas_UI")
     print("all crypto finished.")
 
 
 # timer, execute func() every interval seconds
 def schedule_func(scheduler):
+    global tmpList
+    tmpList = []
     vegas()
-    interval = 10 * 60
+    interval = 7 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
 def initDict():
+    # serialize.dump({}, serialNotifyFile)
+
     global notifyDict
     notifyDict = serialize.load(serialNotifyFile)
 
 
 if __name__ == "__main__":
     initDict()
+
+    getSpotSymbols()
 
     scheduler = sched.scheduler(time.time, time.sleep)
     scheduler.enter(0, 1, schedule_func, (scheduler,))
