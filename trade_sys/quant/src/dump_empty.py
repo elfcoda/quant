@@ -4,7 +4,7 @@
 import utils.serialize as serialize
 
 if __name__ == "__main__":
-    serialize.dump({}, "binance_vegas_5")
+    serialize.dump({}, "binance_day_by_day")
 
 
 

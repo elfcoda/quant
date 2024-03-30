@@ -55,7 +55,7 @@ def notify(symbol, subject, content):
         previousNotify = notifyDict[symbol]
     currentTime = int(time.time())
     if currentTime - previousNotify > notifyInterval:
-        callSomeone(subject, content, PID_WENJIE)
+        # callSomeone(subject, content, PID_WENJIE)
         # callSomeone(subject, content, PID_ZIYAN)
         # callSomeone(subject, content, PID_YOLANDA)
         notifyDict[symbol] = currentTime
@@ -90,6 +90,7 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     ema15m144 = talib.EMA(closes15m, timeperiod = 144)
     ema15m169 = talib.EMA(closes15m, timeperiod = 169)
 
+    ema1h_30 = talib.EMA(closes1h, timeperiod = 30)
     ema144 = talib.EMA(closes1h, timeperiod = 144)
     ema169 = talib.EMA(closes1h, timeperiod = 169)
     ema576 = talib.EMA(closes1h, timeperiod = 576)
@@ -115,7 +116,7 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     diffPercentageVegas = (float(diff) / float(latestPrice)) * 100
     diffPercentage1d = (float(diff1d) / float(latestPrice)) * 100
     # 宽容度会大点
-    diffThreshold = 10
+    diffThreshold = 1.2
     diffThreshold1dNormal = 1.5
     diffThreshold1dGood = 3
 
@@ -131,17 +132,19 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     # 刚跌完，去除此条件
     # and ema144[-2] > ema576[-2]
     # 观察是否突破趋势
-    if diffPercentageVegas < diffThreshold and macdhist1h[-1] > 0 and macdhist1h[-2] < 0:
+    if diffPercentageVegas < diffThreshold:
         tmpList.append(symbolBase)
-        subject = symbolBase + " 接近1H EMA144 偏离" + format(diffPercentageVegas, ".2f")
-        content = symbolBase + " 接近1H EMA144 偏离" + format(diffPercentageVegas, ".2f")
+        subject = symbolBase + " 接近1H EMA144 偏离" + format(diffPercentageVegas, ".2f") + "%"
+        content = symbolBase + " 接近1H EMA144 偏离" + format(diffPercentageVegas, ".2f") + "%"
+        # if isInTrendUp(ema1h_30):
+        #     content += "(趋势向上)"
         if symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
             # 接近日线的优质币
             subject = "精选Vegas币: " + subject
             # if not inSleepMode():
             notify(symbol, subject, content)
             formatPrint3(2, content)
-        elif diffPercentage1d < diffThreshold1dNormal: # and macdhist4h[-1] > macdhist4h[-2] and (abs(macdhist4h[-2]) / abs(macdhist4h[-1])) > 1.067:
+        elif diffPercentage1d < diffThreshold1dNormal and macdhist1h[-1] > 0: # and macdhist1h[-1] > macdhist1h[-2] and (abs(macdhist1h[-2]) / abs(macdhist1h[-1])) > 1.067:
             # 接近日线
             subject = "普通Vegas币(接近日线): " + subject
             # if not inSleepMode():
@@ -150,7 +153,7 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
         else:
             subject = "普通Vegas币: " + subject
             notify(symbol, subject, content)
-            formatPrint3(0, content)
+            formatPrint3(4, content)
 
         cnt += 1
 
@@ -227,7 +230,7 @@ def schedule_func(scheduler):
     global tmpList
     tmpList = []
     vegas()
-    interval = 7 * 60
+    interval = 10 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
 def initDict():

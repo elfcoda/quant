@@ -247,19 +247,23 @@ def getFocus1DayLines(quant_path):
     # symbolBaseList = lowValuesCoins
     # symbolBaseList = serialize.load(quant_path + "LowValueEMA7_UI")
     # symbolBaseList = serialize.load(quant_path + "vegas_UI")
-    symbolBaseList = serialize.load(quant_path + "high_amp_UI")
+    # symbolBaseList = serialize.load(quant_path + "high_amp_UI")
+    symbolBaseList = serialize.load(quant_path + "IncDayByDay_UI")
     # symbolBaseList = bigAmpCoins
+    # symbolBaseList = ["GLM", "OCEAN", "LOKA", "FET", ""]
+
 
     for symbolBase in symbolBaseList:
         symbol = symbolBase + "USDT"
 
-        url = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=500"
+        url = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1d&limit=500"
         urls.append(url)
 
     # symbolBaseList
     # batch request, rsp is ordered
+    print("downloading")
     rsp = asyncio.run(request_urls_batch(urls))
-
+    print("downloaded")
 
     for i in range(0, len(symbolBaseList)):
         symbolBase = symbolBaseList[i]
@@ -273,7 +277,7 @@ def getFocus1DayLines(quant_path):
                 lowestPrice = item[3]
                 closePrice = item[4]
 
-                multiply = 10000
+                multiply = 1
                 if float(openPrice) < 0.1:
                     item[1] = str(float(item[1]) * multiply)
                     item[2] = str(float(item[2]) * multiply)
@@ -282,6 +286,7 @@ def getFocus1DayLines(quant_path):
 
             targetKLines.append([kline, 0, 0, symbolBase])
 
+    print("total: ", len(targetKLines))
     return targetKLines
 
 # TODO

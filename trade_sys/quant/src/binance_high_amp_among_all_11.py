@@ -13,20 +13,21 @@ from binance_comm import *
 from binance_util import *
 from network_binance import request_urls_batch
 from all_coins import coins_wenjie, coins_ziyan
-from high_value import getHighValueCoinsList
+from high_value import getHighValueCoinsList, getAllCoinsList
 from wenjie import trendCoinHour_WENJIE
 from ziyan import trendCoinHour_ZIYAN
 
-serialNotifyFile = "binance_high_amp_monitor"
+serialNotifyFile = "binance_high_amp_among_all"
 cnt = 0
 dumpList = []
+oldPrice = {}
 
 notifyDict = {}
 def notify(symbol, subject, content):
     global notifyDict
 
     previousNotify = 0
-    notifyInterval = 30 * 60
+    notifyInterval = 5 * 60
     # previous notify seconds
     if symbol in notifyDict:
         previousNotify = notifyDict[symbol]
@@ -64,10 +65,6 @@ def forPrt():
 def handleRspStrategy(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     symbolBase = symbol[:-4]
 
-    latest = kline15m[-1]
-    # latest price
-    latestPrice = float(latest[HISTORY_CANDLES_CLOSE])
-
     open1h = np.array(loadOpenPrice(kline1h))[-1]
     close1h = np.array(loadClosePrice(kline1h))[-1]
     open1h2 = np.array(loadOpenPrice(kline1h))[-2]
@@ -79,28 +76,14 @@ def handleRspStrategy(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     amp2 = (float(close1h2) - float(open1h2)) / open1h2 * 100
     amp3 = (float(close1h3) - float(open1h3)) / open1h3 * 100
 
-    totalAmp2 = amp + amp2
-    totalAmp3 = amp + amp2 + amp3
-    if totalAmp2 < -5:
-        dumpList.append(symbolBase)
-        subject = symbolBase + " 1h 暴跌" + format(totalAmp2, ".2f") + "%"
-        content = symbolBase + " 1h 暴跌" + format(totalAmp2, ".2f") + "%"
-        formatPrint3(2, content)
-        notify(symbol, subject, content)
-    elif totalAmp3 < -5:
-        dumpList.append(symbolBase)
-        subject = symbolBase + " 1h 暴跌" + format(totalAmp3, ".2f") + "%"
-        content = symbolBase + " 1h 暴跌" + format(totalAmp3, ".2f") + "%"
-        formatPrint3(2, content)
-        notify(symbol, subject, content)
-
-    # # 对比前n个小时跌幅
-    # n = 3
-    # open1h_n = np.array(loadOpenPrice(kline1h))[-n]
-    # amp_n = (float(latestPrice) - float(open1h_n)) / open1h_n * 100
+    # 对比前n个小时跌幅
+    n = 3
+    open1h_n = np.array(loadOpenPrice(kline1h))[-n]
+    global oldPrice
+    oldPrice[symbolBase] = open1h_n
 
 
-def func():
+def initPrice():
     global cnt
     cnt = 0
 
@@ -115,12 +98,38 @@ def func():
         kline1d = eval(rsp1d[i][1])
         handleRspStrategy(symbolBase + "USDT", kline3m, kline15m, kline1h, kline4h, kline1d)
 
-    forPrt()
+ampDict = {}
+def func():
+    global oldPrice
+    global ampDict
+    ampDict = {}
+    for symbolBase in oldPrice:
+        price = oldPrice[symbolBase]
+        latestPrice = getLatestPrice(symbolBase)
+        amp_n = (float(latestPrice) - float(price)) / price * 100
+        ampDict[amp_n] = symbolBase
 
-    print("total: ", cnt)
-    serialize.dump(dumpList, "high_amp_UI")
-    print("all crypto finished.")
-    print("重要: 请观察均线规律开单!!!")
+    allCoinsLi = getAllCoinsList()
+    ampList = sorted(ampDict.items())
+
+    excludedCoins = ["REI", "RAD"]
+    cnt = 0
+    for pa in ampList:
+        pa_amp = pa[0]
+        pa_symbol_base = pa[1]
+
+        if pa_symbol_base in excludedCoins:
+            continue
+
+        if pa_symbol_base in allCoinsLi:
+            cnt += 1
+            if cnt > 30:
+                print("scan completed.")
+                return
+
+            formatPrint3(2, pa_symbol_base + "跌幅: " + format(pa_amp, ".2f"))
+
+
 
 # timer, execute func() every interval seconds
 def schedule_func(scheduler):
@@ -147,6 +156,8 @@ def initDict():
 
 if __name__ == "__main__":
     initDict()
+
+    initPrice()
 
     scheduler = sched.scheduler(time.time, time.sleep)
     scheduler.enter(0, 1, schedule_func, (scheduler,))

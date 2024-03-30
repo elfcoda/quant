@@ -17,7 +17,7 @@ from high_value import getHighValueCoinsList
 from wenjie import trendCoinHour_WENJIE
 from ziyan import trendCoinHour_ZIYAN
 
-serialNotifyFile = "binance_high_amp_monitor"
+serialNotifyFile = "binance_day_by_day"
 cnt = 0
 dumpList = []
 
@@ -68,36 +68,18 @@ def handleRspStrategy(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     # latest price
     latestPrice = float(latest[HISTORY_CANDLES_CLOSE])
 
-    open1h = np.array(loadOpenPrice(kline1h))[-1]
-    close1h = np.array(loadClosePrice(kline1h))[-1]
-    open1h2 = np.array(loadOpenPrice(kline1h))[-2]
-    close1h2 = np.array(loadClosePrice(kline1h))[-2]
-    open1h3 = np.array(loadOpenPrice(kline1h))[-3]
-    close1h3 = np.array(loadClosePrice(kline1h))[-3]
+    low1 = np.array(loadLowPrice(kline1d))[-1]
+    low2 = np.array(loadLowPrice(kline1d))[-2]
+    low3 = np.array(loadLowPrice(kline1d))[-3]
+    low4 = np.array(loadLowPrice(kline1d))[-4]
 
-    amp = (float(close1h) - float(open1h)) / open1h * 100
-    amp2 = (float(close1h2) - float(open1h2)) / open1h2 * 100
-    amp3 = (float(close1h3) - float(open1h3)) / open1h3 * 100
-
-    totalAmp2 = amp + amp2
-    totalAmp3 = amp + amp2 + amp3
-    if totalAmp2 < -5:
+    global cnt
+    global dumpList
+    excludedList = ["AEVO", "SUN"]
+    if low1 > low2 > low3 > low4:
+        formatPrint3(2, symbolBase + "日线渐涨")
+        cnt += 1
         dumpList.append(symbolBase)
-        subject = symbolBase + " 1h 暴跌" + format(totalAmp2, ".2f") + "%"
-        content = symbolBase + " 1h 暴跌" + format(totalAmp2, ".2f") + "%"
-        formatPrint3(2, content)
-        notify(symbol, subject, content)
-    elif totalAmp3 < -5:
-        dumpList.append(symbolBase)
-        subject = symbolBase + " 1h 暴跌" + format(totalAmp3, ".2f") + "%"
-        content = symbolBase + " 1h 暴跌" + format(totalAmp3, ".2f") + "%"
-        formatPrint3(2, content)
-        notify(symbol, subject, content)
-
-    # # 对比前n个小时跌幅
-    # n = 3
-    # open1h_n = np.array(loadOpenPrice(kline1h))[-n]
-    # amp_n = (float(latestPrice) - float(open1h_n)) / open1h_n * 100
 
 
 def func():
@@ -115,12 +97,8 @@ def func():
         kline1d = eval(rsp1d[i][1])
         handleRspStrategy(symbolBase + "USDT", kline3m, kline15m, kline1h, kline4h, kline1d)
 
-    forPrt()
-
     print("total: ", cnt)
-    serialize.dump(dumpList, "high_amp_UI")
     print("all crypto finished.")
-    print("重要: 请观察均线规律开单!!!")
 
 # timer, execute func() every interval seconds
 def schedule_func(scheduler):
@@ -135,6 +113,7 @@ def schedule_func(scheduler):
     li4 = []
     dumpList = []
     func()
+    serialize.dump(dumpList, "IncDayByDay_UI")
     interval = 5 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))
 
