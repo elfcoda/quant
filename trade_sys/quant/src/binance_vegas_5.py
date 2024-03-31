@@ -45,6 +45,21 @@ def getSpotSymbols():
 def symbolList2symbolBaseList(sl):
     return list(map(lambda symbol: symbol[:-4], sl))
 
+def notify2(symbol, subject, content):
+    global notifyDict
+
+    previousNotify = 0
+    notifyInterval = 6 * 60 * 60
+    # previous notify seconds
+    if symbol in notifyDict:
+        previousNotify = notifyDict[symbol]
+    currentTime = int(time.time())
+    if currentTime - previousNotify > notifyInterval:
+        callSomeone(subject, content, PID_WENJIE)
+        callSomeone(subject, content, PID_YOLANDA)
+        notifyDict[symbol] = currentTime
+        serialize.dump(notifyDict, serialNotifyFile)
+
 def notify(symbol, subject, content):
     global notifyDict
 
@@ -81,9 +96,9 @@ def addFor(symbolBase, tp, content):
     global nLi
     global nLiLow
     if symbolBase in lowValuesCoins:
-        nLiLow.append([1, content])
+        nLiLow.append([1, content, symbolBase])
     else:
-        nLi.append([tp, content])
+        nLi.append([tp, content, symbolBase])
 
 def prtFot():
     global nLi
@@ -91,9 +106,12 @@ def prtFot():
     for item in nLi:
         formatPrint3(item[0], item[1])
 
+    dumpTmp = []
     for item in nLiLow:
         formatPrint3(item[0], item[1])
+        dumpTmp.append(item[2])
 
+    serialize.dump(dumpTmp, "dumpTmp_UI")
 
 def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     symbolBase = symbol[:-4]
@@ -122,7 +140,7 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
 
     diff = abs(latestPrice - ema144[-1])
 
-    ema576List = ["OP", "SKL"]
+    ema576List = ["OP", "SKL", "ACA"]
     ema15m144List = ["ETHFI"]
     if symbolBase in ema576List:
         diff = abs(latestPrice - ema576[-1])
@@ -145,6 +163,7 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
 
     mac4h, macdsignal4h, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
     mac1h, macdsignal1h, macdhist1h = talib.MACD(closes1h, fastperiod=12, slowperiod=26, signalperiod=9)
+    mac15m, macdsignal15m, macdhist15m = talib.MACD(closes15m, fastperiod=12, slowperiod=26, signalperiod=9)
 
     global cnt
     global tmpList
@@ -154,10 +173,20 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     if diffPercentageVegas < diffThreshold:
         tmpList.append(symbolBase)
         subject = symbolBase + " 接近1H EMA144 偏离" + format(diffPercentageVegas, ".2f") + "%"
-        content = symbolBase + " 接近1H EMA144 偏离" + format(diffPercentageVegas, ".2f") + "%"
+        content = symbolBase + " 接近1H EMA144 偏离" + format(diffPercentageVegas, ".2f") + "%。"
+        # if macdhist15m[-1] > macdhist15m[-2] or macdhist15m[-1] > 0:
+        #     content += "15m 线已止跌或启动。"
+        if macdhist1h[-1] > macdhist1h[-2] or macdhist1h[-1] > 0:
+            content += "1h 线已止跌或启动。"
         # if isInTrendUp(ema1h_30):
         #     content += "(趋势向上)"
-        if symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
+
+        # special PEPE
+        if symbolBase == "PEPE":
+            s = "PEPE 接近1H EMA144, Vegas偏离" + format(diffPercentageVegas, ".2f") + "%"
+            notify2(symbol, s, s)
+
+        elif symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
             # 接近日线的优质币
             subject = "精选Vegas币: " + subject
             # if not inSleepMode():
