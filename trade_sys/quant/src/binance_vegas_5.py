@@ -75,6 +75,25 @@ def filterVegasCoins(configCoins):
 
     return vegasSymbolBaseList
 
+nLi = []
+nLiLow = []
+def addFor(symbolBase, tp, content):
+    global nLi
+    global nLiLow
+    if symbolBase in lowValuesCoins:
+        nLiLow.append([1, content])
+    else:
+        nLi.append([tp, content])
+
+def prtFot():
+    global nLi
+    global nLiLow
+    for item in nLi:
+        formatPrint3(item[0], item[1])
+
+    for item in nLiLow:
+        formatPrint3(item[0], item[1])
+
 
 def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     symbolBase = symbol[:-4]
@@ -143,17 +162,17 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
             subject = "精选Vegas币: " + subject
             # if not inSleepMode():
             notify(symbol, subject, content)
-            formatPrint3(2, content)
+            addFor(symbolBase, 2, content)
         elif diffPercentage1d < diffThreshold1dNormal and macdhist1h[-1] > 0: # and macdhist1h[-1] > macdhist1h[-2] and (abs(macdhist1h[-2]) / abs(macdhist1h[-1])) > 1.067:
             # 接近日线
             subject = "普通Vegas币(接近日线): " + subject
             # if not inSleepMode():
             notify(symbol, subject, content)
-            formatPrint3(3, content)
+            addFor(symbolBase, 3, content)
         else:
             subject = "普通Vegas币: " + subject
             notify(symbol, subject, content)
-            formatPrint3(4, content)
+            addFor(symbolBase, 4, content)
 
         cnt += 1
 
@@ -220,6 +239,7 @@ def vegas():
         kline1d = eval(rsp1d[i][1])
         handleRspStrategy1(symbolBase + "USDT", kline3m, kline15m, kline1h, kline4h, kline1d)
 
+    prtFot()
     print("total: ", cnt)
     serialize.dump(tmpList, "vegas_UI")
     print("all crypto finished.")
@@ -228,7 +248,11 @@ def vegas():
 # timer, execute func() every interval seconds
 def schedule_func(scheduler):
     global tmpList
+    global nLi
+    global nLiLow
     tmpList = []
+    nLi = []
+    nLiLow = []
     vegas()
     interval = 10 * 60
     scheduler.enter(interval, 1, schedule_func, (scheduler,))

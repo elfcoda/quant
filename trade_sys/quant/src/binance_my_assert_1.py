@@ -17,12 +17,8 @@ ASSERT_IDX_NOFITY_PRICES = 1
 ASSERT_IDX_MACD_DOWN = 2
 ASSERT_IDX_VEGAS_15 = 3
 myAsserts = {
-            # "FTM": [1.035, [1.11], False],
-            # "MKR": [3090, [3233], False],
-            # "SUI": [2.6, [], False],
-            # "PEPE": [0.00000750, [0.0000076], False],
-            # "FLOW": [1.433, [], True],
-            # "XTZ": [1.363, [], True],
+            "ID": [1.232, [], True],
+            "ALPHA": [0.1629, [], True],
         }
 
 NOTIFY_TYPE_PRICE = 0
@@ -47,7 +43,7 @@ def notifyAndSetup(nkey, currentTime, subject, content):
 
 
 
-def shouldNotify(currentTime, nkey, notifyInterval = 10 * 60):
+def shouldNotify(currentTime, nkey, notifyInterval = 15 * 60):
     global notifyDict
 
     previousNotify = 0
@@ -59,7 +55,7 @@ def shouldNotify(currentTime, nkey, notifyInterval = 10 * 60):
 def symbolMACD(symbolBase, monitorPrice):
     # monitorPrice不想监控就写0
     symbol = symbolBase + "USDT"
-    KLineUrl = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=15m&limit=100"
+    KLineUrl = "https://data-api.binance.vision/api/v3/klines?symbol=" + symbol + "&interval=1h&limit=100"
 
     response = requests.get(KLineUrl)
     kline = eval(response.text)

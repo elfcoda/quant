@@ -248,9 +248,18 @@ def getFocus1DayLines(quant_path):
     # symbolBaseList = serialize.load(quant_path + "LowValueEMA7_UI")
     # symbolBaseList = serialize.load(quant_path + "vegas_UI")
     # symbolBaseList = serialize.load(quant_path + "high_amp_UI")
-    symbolBaseList = serialize.load(quant_path + "IncDayByDay_UI")
+    # symbolBaseList = serialize.load(quant_path + "IncDayByDay_UI")
     # symbolBaseList = bigAmpCoins
     # symbolBaseList = ["GLM", "OCEAN", "LOKA", "FET", ""]
+    symbolBaseList = ["HARD", "VITE", "PSG", "WING", "BAR", "DOCK", "ALPACA", "AMB", "KP3R", "ADX", "VOXEL", "BURGER", "VIDT", "FIS", "AVA", "COS", "CHESS", "CREAM", "QUICK", "KEY", "BSW",
+        "KMD", "AEUR", "FIDA", "BEL", "UNFI", "LOKA", "LIT", "IRIS", "UTK", "MDX", "COMBO",
+        "ALCX", "REEF", "MLN", "DEGO", "FUN", "FLM", "MDT", "DIA", "ORN", "IDEX", "AERGO", "LEVER", "BETA", "DATA", "PDA", "ATA", "WAN", "GHST", "WNXM", "NULS",
+        "PERP", "VIC", "FORTH", "REN", "XVG", "CTXC", "TLM", "QKC", "HIGH", "MBL", "FRONT", "LTO", "TKO", "NKN", "POLS", "CLV", "WRX", "STMX", "QI", "OGN",
+        "ERN", "CTK", "AGLD", "MBOX", "SPELL", "RARE", "BAKE", "ALICE", "LQTY", "PHB", "ARDR", "BADGER", "GTC", "DAR", "ALPHA", "LOOM", "MTL", "HIFI", "STG",
+        "STEEM", "OMG", "GNS", "SUN", "OXT", "WIN", "RDNT", "STPT", "DODO", "ONG", "KNC", "RAD", "MAV", "PUNDIX", "HFT", "REQ", "ACA", "STRAX", "BLZ",
+        "TRU", "MOVR", "SNT", "ARK", "DENT", "SCRT", "PEOPLE", "BNX", "HOOK", "PHA", "POWR", "PYR", "ZEN", "HIVE", "SYS", "CVC", "XNO", "NFP", "DGB", "TRB",
+        "NMR", "ACE", "SYN", "REI", "CTSI", "SLP", "USTC", "LSK", "CYBER", "XVS", "CELR", "AI", "IOST", "PROM", "IQ", "RLC", "RIF", "DUSK", "POND", "BAL",
+        "SXP", "MAGIC", "C98", "COTI", "EDU", "BAND", "ONT", "ACH", "VTHO", "VANRY"]
 
 
     for symbolBase in symbolBaseList:
