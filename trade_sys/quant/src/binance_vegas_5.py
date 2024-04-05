@@ -153,9 +153,9 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     diffPercentageVegas = (float(diff) / float(latestPrice)) * 100
     diffPercentage1d = (float(diff1d) / float(latestPrice)) * 100
     # 宽容度会大点
-    diffThreshold = 1.2
-    diffThreshold1dNormal = 1.5
-    diffThreshold1dGood = 3
+    diffThreshold = 2.8
+    diffThreshold1dNormal = 20
+    diffThreshold1dGood = 30
 
     vegasSymbolList = filterVegasCoins(trendCoinHour_WENJIE)
     vegasSymbolList2 = filterVegasCoins(trendCoinHour_ZIYAN)
@@ -164,6 +164,8 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     mac4h, macdsignal4h, macdhist4h = talib.MACD(closes4h, fastperiod=12, slowperiod=26, signalperiod=9)
     mac1h, macdsignal1h, macdhist1h = talib.MACD(closes1h, fastperiod=12, slowperiod=26, signalperiod=9)
     mac15m, macdsignal15m, macdhist15m = talib.MACD(closes15m, fastperiod=12, slowperiod=26, signalperiod=9)
+
+    #######TODO VegasInlowValuesCoins = []
 
     global cnt
     global tmpList
@@ -186,13 +188,13 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
             s = "PEPE 接近1H EMA144, Vegas偏离" + format(diffPercentageVegas, ".2f") + "%"
             notify2(symbol, s, s)
 
-        elif symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood:
+        elif symbolBase in vegasSymbolList and diffPercentage1d < diffThreshold1dGood and (macdhist1h[-1] > macdhist1h[-2] or macdhist1h[-1] > 0):
             # 接近日线的优质币
             subject = "精选Vegas币: " + subject
             # if not inSleepMode():
             notify(symbol, subject, content)
             addFor(symbolBase, 2, content)
-        elif diffPercentage1d < diffThreshold1dNormal and macdhist1h[-1] > 0: # and macdhist1h[-1] > macdhist1h[-2] and (abs(macdhist1h[-2]) / abs(macdhist1h[-1])) > 1.067:
+        elif diffPercentage1d < diffThreshold1dNormal and (macdhist1h[-1] > macdhist1h[-2] or macdhist1h[-1] > 0): # and macdhist1h[-1] > macdhist1h[-2] and (abs(macdhist1h[-2]) / abs(macdhist1h[-1])) > 1.067:
             # 接近日线
             subject = "普通Vegas币(接近日线): " + subject
             # if not inSleepMode():

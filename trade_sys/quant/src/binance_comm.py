@@ -262,6 +262,12 @@ lowValuesCoins = [
         "TWT", "METIS", "ALT", "GMT", "LRC", "SC", "OM", "SKL", "TFUEL", "ILV", "FLUX", "GAL", "GLM", "ZEC", "ETHFI", "ANKR", "BAT", "AMP", "GLMR", "GMX", "QTUM", "ELF", "GAS", "MASK",
         "XEM", "ONE", "MEME", "DASH", "WAVES", "SUSHI", "DCR", "KDA", "PAXG", "ARKM", "DEXE" ]
 
+# 红色缓慢上升就等绿柱，否则直接上.非vrgas币基本不用看
+VegasInlowValuesCoins = [
+    "HARD", "VITE", "PSG", "BAR", "DOCK", "ALPACA", "AMB", "ADX", "VOXEL", "BURGER", "VIDT", "FIS", "COS", "CREAM", "FUN", "FLM", "LEVER", "QKC", "HIGH", "LTO", "NKN", "MBOX", "SPELL", "RARE", "ARDR", "GTC",
+    "DAR", "MTL", "HIFI", "STG", "STEEM", "OXT", "RDNT", "STPT", "KNC", "RAD", "MAV", "HFT", "REQ", "HOOK", "PHA", "SYS", "DGB", "SYN", "BAL", "SXP", "C98", "VANRY"
+]
+
 
 bigAmpCoins = ["REI", "FOR", "BOND", "AEVO", "CLV", "ETHFI", "WAN", "TRU"]
 
