@@ -55,8 +55,8 @@ def notify2(symbol, subject, content):
         previousNotify = notifyDict[symbol]
     currentTime = int(time.time())
     if currentTime - previousNotify > notifyInterval:
-        callSomeone(subject, content, PID_WENJIE)
-        callSomeone(subject, content, PID_YOLANDA)
+        # callSomeone(subject, content, PID_WENJIE)
+        # callSomeone(subject, content, PID_YOLANDA)
         notifyDict[symbol] = currentTime
         serialize.dump(notifyDict, serialNotifyFile)
 
@@ -95,7 +95,8 @@ nLiLow = []
 def addFor(symbolBase, tp, content):
     global nLi
     global nLiLow
-    if symbolBase in lowValuesCoins:
+    # if symbolBase in lowValuesCoins:
+    if symbolBase in VegasInlowValuesCoins:
         nLiLow.append([1, content, symbolBase])
     else:
         nLi.append([tp, content, symbolBase])
@@ -153,7 +154,7 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     diffPercentageVegas = (float(diff) / float(latestPrice)) * 100
     diffPercentage1d = (float(diff1d) / float(latestPrice)) * 100
     # 宽容度会大点
-    diffThreshold = 2.8
+    diffThreshold = 2
     diffThreshold1dNormal = 20
     diffThreshold1dGood = 30
 
@@ -203,7 +204,7 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
         else:
             subject = "普通Vegas币: " + subject
             notify(symbol, subject, content)
-            addFor(symbolBase, 4, content)
+            addFor(symbolBase, 0, content)
 
         cnt += 1
 
