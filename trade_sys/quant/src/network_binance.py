@@ -7,9 +7,11 @@ import asyncio
 import aiohttp
 import time
 
+# TODO SSL = False
+
 # 其实不需要加index，已经是有序的
 async def fetch_data(session, url, index):
-    async with session.get(url) as response:
+    async with session.get(url, ssl=False) as response:
         # 获取响应内容
         data = await response.text()
         # 返回请求的索引和响应内容
