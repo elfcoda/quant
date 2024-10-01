@@ -133,7 +133,7 @@ def handleRspStrategy1(symbol, kline3m, kline15m, kline1h, kline4h, kline1d):
     ema169 = talib.EMA(closes1h, timeperiod = 169)
     ema576 = talib.EMA(closes1h, timeperiod = 576)
     ema676 = talib.EMA(closes1h, timeperiod = 676)
-    ma7 = talib.MA(closes1d, timeperiod=7, matype=0)
+    ma7 = talib.MA(closes1d, timeperiod=7)
     # print("latest EMA144: ", ema144[-1])
 
     # latest price
